@@ -8,6 +8,7 @@
         "database": "internetbanking"
     },
     "partner": {
-        "partnerCode": "xxxBankLovesyyyBank"
+        "partnerCode": "xxxBankLovesyyyBank",
+        "SecretKey": "InternetBanking"
     }
 }
