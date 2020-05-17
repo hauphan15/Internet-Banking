@@ -10,5 +10,11 @@
     "partner": {
         "partnerCode": "xxxBankLovesyyyBank",
         "SecretKey": "InternetBanking"
+    },
+    "pgp": {
+        "name": "Phan Van Hau",
+        "email": "mr.hauphan@gmail.com",
+        "keySize": 4096,
+        "passphrase": "mrhauphan"
     }
 }

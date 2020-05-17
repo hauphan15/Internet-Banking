@@ -5,14 +5,12 @@ const userAccountModel = require('../models/UserAccount.model');
 const router = express.Router();
 
 
-
-
-
-router.get('/', async function(req, res) {
-    const listAcc = await userAccountModel.all();
-    res.json(listAcc);
+router.post('/infor', async function(req, res) {
+    const listAcc = await userAccountModel.single(req.body.UserID);
+    if (listAcc.length === 0)
+        return res.send('UserId not found');
+    res.json(listAcc[0]);
 })
-
 
 
 module.exports = router;
