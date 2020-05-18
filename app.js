@@ -36,6 +36,7 @@ app.use(function(err, req, res, next) {
     res.status(statusCode).send('View error log on console.');
 })
 
-app.listen(process.env.PORT || 3000, () => {
-    console.log('API is running at http://localhost:3000');
+var PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`API is running on port ${PORT}`);
 })
