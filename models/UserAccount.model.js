@@ -2,5 +2,6 @@ const db = require('../utils/db');
 
 module.exports = {
     all: _ => db.load('SELECT * FROM useraccounts'),
-    single: id => db.load(`SELECT * FROM useraccounts WHERE UserID = ${id}`)
+    singleById: id => db.load(`SELECT * FROM useraccounts WHERE UserID = ${id}`),
+    singleByNumber: number => db.load(`SELECT * FROM useraccounts WHERE Number = ${number}`)
 };

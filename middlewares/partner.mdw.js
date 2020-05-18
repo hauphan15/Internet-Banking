@@ -4,62 +4,8 @@ const moment = require('moment');
 const CryptoJS = require('crypto-js');
 const openpgp = require('openpgp');
 
-
-
-module.exports = {
-
-    partnerCode: (req, res, next) => {
-        const partnerCode = req.headers['x-partner-code'];
-        //so sanh partnerCode
-        if (partnerCode === config.partner.partnerCode) {
-            console.log('partnerCode: passed');
-            next();
-
-        } else {
-            res.send('Invalid partnerCode or partnerCode not found');
-            throw createError(401, 'Invalid partnerCode or partnerCode not found');
-        }
-    },
-    partnerTime: (req, res, next) => {
-
-        const partnerTime = req.headers['x-partner-time'];
-        const now = moment().unix();
-        //kiem tra goi tin da qua han hay chua, chi chap nhan goi tin da gui duoi 30s
-        if ((now - partnerTime) <= 30) {
-            console.log('partnerTime: passed');
-            next();
-        } else {
-
-            res.send('Invalid time');
-            throw createError(401, 'Invalid time');
-        }
-    },
-    partnerSig: (req, res, next) => {
-
-        const partnerSig = req.headers['x-partner-sig']; //lay partnerSig do nganHangB hashmd5 ra
-        const partnerTime = +req.headers['x-partner-time']; //lay time gui goi tin, '+' de parse sang number type
-        //obj chua body: la UserID(user-account/infor) hoac la UserID,Number,Money(account-number/add)
-        const obj = {
-            Body: req.body,
-            Time: partnerTime
-        };
-        //console.log(obj);
-        //hash obj chua req.body va time
-        const hash = CryptoJS.MD5(JSON.stringify(obj), config.partner.SecretKey).toString();
-        if (partnerSig === hash) {
-            console.log('partnerSig: passed')
-            next();
-        } else {
-
-            res.send('Invalid signature');
-            throw createError(401, 'Invalid signature');
-        }
-
-    },
-    partnerAsymmetricSig: (req, res, next) => {
-        // put keys in backtick (``) to avoid errors caused by spaces or tab
-        //cac key cua ngan hang phan van hau
-        const pubkey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
+//cac key cua ngan hang phan van hau
+const pubkey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: OpenPGP.js v4.10.4
 Comment: https://openpgpjs.org
 
@@ -115,7 +61,7 @@ U+ffMrtVVFe5quZw6G8+kBCq4abjEPRG3gL0XIWFJOUtvoubKjICfSWzkZff
 LqP1
 =KS+F
 -----END PGP PUBLIC KEY BLOCK-----`;
-        const privkey = `-----BEGIN PGP PRIVATE KEY BLOCK-----
+const privkey = `-----BEGIN PGP PRIVATE KEY BLOCK-----
 Version: OpenPGP.js v4.10.4
 Comment: https://openpgpjs.org
 
@@ -230,8 +176,66 @@ gku2XDSKEkBv15NA5XTj+2Fg6wLqvMvSY6jcA91jzCwdz9JvAN0VcSe7cCdK
 9FyFhSTlLb6LmyoyAn0ls5GX3y6j9Q==
 =5e+c
 -----END PGP PRIVATE KEY BLOCK-----`; //encrypted private key
+
+
+
+module.exports = {
+
+    partnerCode: (req, res, next) => {
+        const partnerCode = req.headers['x-partner-code'];
+        //so sanh partnerCode
+        if (partnerCode === config.partner.partnerCode) {
+            console.log('partnerCode: passed');
+            next();
+
+        } else {
+            res.send('Invalid partnerCode or partnerCode not found');
+            throw createError(401, 'Invalid partnerCode or partnerCode not found');
+        }
+    },
+    partnerTime: (req, res, next) => {
+
+        const partnerTime = req.headers['x-partner-time'];
+        const now = moment().unix();
+        //kiem tra goi tin da qua han hay chua, chi chap nhan goi tin da gui duoi 30s
+        if ((now - partnerTime) <= 30) {
+            console.log('partnerTime: passed');
+            next();
+        } else {
+
+            res.send('Invalid time');
+            throw createError(401, 'Invalid time');
+        }
+    },
+    partnerSig: (req, res, next) => {
+
+        const partnerSig = req.headers['x-partner-sig']; //lay partnerSig do nganHangB hashmd5 ra
+        const partnerTime = +req.headers['x-partner-time']; //lay time gui goi tin, '+' de parse sang number type
+        //obj chua body: la UserID(user-account/infor) hoac la UserID,Number,Money(account-number/add)
+        const obj = {
+            Body: req.body,
+            Time: partnerTime
+        };
+        console.log(obj);
+        //hash obj chua req.body va time
+        const hash = CryptoJS.MD5(JSON.stringify(obj), config.partner.SecretKey).toString();
+        if (partnerSig === hash) {
+            console.log('partnerSig: passed')
+            next();
+        } else {
+
+            res.send('Invalid signature');
+            throw createError(401, 'Invalid signature');
+        }
+
+    },
+    partnerAsymmetricSig: (req, res, next) => {
+        const code = req.headers['x-partner-code'];
+        // put keys in backtick (``) to avoid errors caused by spaces or tab
         //public key cua ngan hang doi tac
-        const NganHangBPublicKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
+        var NganHangBPublicKey;
+        if (code === 'xxxBankLovesyyyBank') { //neu la ngan hang dung PGP
+            NganHangBPublicKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: OpenPGP.js v4.10.4
 Comment: https://openpgpjs.org
 
@@ -286,6 +290,13 @@ i6T+KCFsY/bHyRU2fE2RgnjXaOuC03YzaLielIML/Y0ySN6/ZkvPaNIWgHJD
 LDEywoMQNUZukM5qePRhUwidkqvdDenP4vJbe1cNsWE+9ekO1FQWpOcLQ5I=
 =+3Gn
 -----END PGP PUBLIC KEY BLOCK-----`;
+
+        } else if (code === '') { //neu la ngan hang dung RSA
+            NganHangBPublicKey = ``;
+        }
+        //gan public key de qua route lay dung
+        req.NganHangBPublicKey = NganHangBPublicKey;
+
         const passphrase = `mrhauphan`; //what the privKey is encrypted with
 
         const NganHangBMessage = req.body.message; //body gui den chua encryptedMessage, nganHangA lay ve decrypt message

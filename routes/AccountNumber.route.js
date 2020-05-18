@@ -239,7 +239,7 @@ const router = express.Router();
 
 router.post('/add', async function(req, res) {
 
-    const accBal = await AccNumModel.single(req.Data.UserID); //lay so du tai khoan
+    const accBal = await AccNumModel.singleById(req.Data.UserID); //lay so du tai khoan
     const money = +accBal[0].AccountBalance + (+req.Data.Money); //cong voi tien can nap vo
     const entity = {
         AccountBalance: money
@@ -254,7 +254,7 @@ router.post('/add', async function(req, res) {
 
         const options = {
             message: openpgp.message.fromText(JSON.stringify(ret)), // input as Message object
-            publicKeys: (await openpgp.key.readArmored(NganHangBPublicKey)).keys, // for encryption
+            publicKeys: (await openpgp.key.readArmored(req.NganHangBPublicKey)).keys, // for encryption
             privateKeys: [privKeyObj], // for signing (optional),
         }
 
