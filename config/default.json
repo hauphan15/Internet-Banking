@@ -16,5 +16,12 @@
         "email": "mr.hauphan@gmail.com",
         "keySize": 4096,
         "passphrase": "mrhauphan"
+    },
+    "herokuMySQL": {
+        "host": "us-cdbr-east-06.cleardb.net",
+        "port": 3306,
+        "user": "b2145fe2686b76",
+        "password": "b40f490f",
+        "database": "heroku_9c815e43c50021f"
     }
 }

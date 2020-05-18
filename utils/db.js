@@ -1,10 +1,11 @@
 const mysql = require('mysql');
 const { promisify } = require('util');
-// const promisify = require('util').promisify;
+
 
 const config = require('../config/default.json');
 
-const pool = mysql.createPool(config.mysql);
+
+const pool = mysql.createPool(config.herokuMySQL);
 const pool_query = promisify(pool.query).bind(pool);
 
 module.exports = {
