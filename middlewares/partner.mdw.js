@@ -184,7 +184,7 @@ module.exports = {
     partnerCode: (req, res, next) => {
         const partnerCode = req.headers['x-partner-code'];
         //so sanh partnerCode
-        if (partnerCode === config.partner.partnerCode) {
+        if (partnerCode === config.partner.partnerCodePGP || partnerCode === config.partner.partnerCodeRSA) {
             console.log('partnerCode: passed');
             next();
 
@@ -197,8 +197,8 @@ module.exports = {
 
         const partnerTime = req.headers['x-partner-time'];
         const now = moment().unix();
-        //kiem tra goi tin da qua han hay chua, chi chap nhan goi tin da gui duoi 30s
-        if ((now - partnerTime) <= 30) {
+        //kiem tra goi tin da qua han hay chua, chi chap nhan goi tin da gui duoi 60s
+        if ((now - partnerTime) <= 60) {
             console.log('partnerTime: passed');
             next();
         } else {
@@ -292,7 +292,12 @@ LDEywoMQNUZukM5qePRhUwidkqvdDenP4vJbe1cNsWE+9ekO1FQWpOcLQ5I=
 -----END PGP PUBLIC KEY BLOCK-----`;
 
         } else if (code === '') { //neu la ngan hang dung RSA
-            NganHangBPublicKey = ``;
+            NganHangBPublicKey = `-----BEGIN PUBLIC KEY-----
+MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgFzcv1eeq8IF3xXlhPHZSEWcQib/
+oLGhx5KhwDjJr6A9d0HwJMkyso6m1O8w7vEtTbWSG9Yq5WYQHW9vfc6XgDwT+8gr
+xQIOFQs85imInMDyvnqNEJKqSVdPL9057pbaZILxXU1/yUUJmqme+y+5Rc9MDx7P
+VDuD8Sm0MqcDhrUJAgMBAAE=
+-----END PUBLIC KEY-----`;
         }
         //gan public key de qua route lay dung
         req.NganHangBPublicKey = NganHangBPublicKey;

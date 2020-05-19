@@ -8,7 +8,8 @@
         "database": "internetbanking"
     },
     "partner": {
-        "partnerCode": "xxxBankLovesyyyBank",
+        "partnerCodePGP": "xxxBankLovesyyyBank",
+        "partnerCodeRSA": "sacombank",
         "SecretKey": "InternetBanking"
     },
     "pgp": {
