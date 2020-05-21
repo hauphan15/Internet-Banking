@@ -1,8 +1,8 @@
 const express = require('express');
 const AccNumModel = require('../models/AccountNumber.model');
-
-const CryptoJS = require('crypto-js');
+const createError = require('http-errors');
 const openpgp = require('openpgp');
+
 //key cua ngan hang A pvhau
 const pubkey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: OpenPGP.js v4.10.4
@@ -183,6 +183,10 @@ const router = express.Router();
 
 router.post('/add', async function(req, res) {
     const id = await AccNumModel.singleByNumber(req.Data.Number);
+    if (id.length <= 0) {
+        res.send('Number not found');
+        throw createError(401, 'Number not found');
+    }
     const accBal = await AccNumModel.singleById(id[0].UserID); //lay so du tai khoan
     const money = +accBal[0].AccountBalance + (+req.Data.Money); //cong voi tien can nap vo
     const entity = {

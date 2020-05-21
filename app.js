@@ -2,14 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
-const connectDB = require('./DB/connection');
 
 const verifyPartner = require('./middlewares/partner.mdw');
 
 require('express-async-errors');
 
 const app = express();
-connectDB();
 app.use(cors());
 app.use(morgan('dev'));
 app.use(cors());
@@ -22,8 +20,7 @@ app.get('/', function(req, res) {
     res.send('Hello from Mrhauphan !!');
 })
 
-app.use('/user-account',/* verifyPartner.partnerCode, verifyPartner.partnerTime, verifyPartner.partnerSig, */
-require('./routes/UserAccount.route'));
+app.use('/user-account', verifyPartner.partnerCode, verifyPartner.partnerTime, verifyPartner.partnerSig, require('./routes/UserAccount.route'));
 
 app.use('/account-number', verifyPartner.partnerCode, verifyPartner.partnerTime, verifyPartner.partnerSig, verifyPartner.partnerAsymmetricSig, require('./routes/AccountNumber.route'));
 
