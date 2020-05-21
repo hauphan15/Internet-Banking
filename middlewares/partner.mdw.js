@@ -216,7 +216,7 @@ module.exports = {
             Body: req.body,
             Time: partnerTime
         };
-        console.log(obj);
+        //console.log(obj);
         //hash obj chua req.body va time
         const hash = CryptoJS.MD5(JSON.stringify(obj), config.partner.SecretKey).toString();
         if (partnerSig === hash) {
@@ -291,7 +291,7 @@ LDEywoMQNUZukM5qePRhUwidkqvdDenP4vJbe1cNsWE+9ekO1FQWpOcLQ5I=
 =+3Gn
 -----END PGP PUBLIC KEY BLOCK-----`;
 
-        } else if (code === '') { //neu la ngan hang dung RSA
+        } else if (code === 'sacombank') { //neu la ngan hang dung RSA
             NganHangBPublicKey = `-----BEGIN PUBLIC KEY-----
 MIGeMA0GCSqGSIb3DQEBAQUAA4GMADCBiAKBgFzcv1eeq8IF3xXlhPHZSEWcQib/
 oLGhx5KhwDjJr6A9d0HwJMkyso6m1O8w7vEtTbWSG9Yq5WYQHW9vfc6XgDwT+8gr

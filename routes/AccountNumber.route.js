@@ -182,13 +182,13 @@ const router = express.Router();
 
 
 router.post('/add', async function(req, res) {
-
-    const accBal = await AccNumModel.singleById(req.Data.UserID); //lay so du tai khoan
+    const id = await AccNumModel.singleByNumber(req.Data.Number);
+    const accBal = await AccNumModel.singleById(id[0].UserID); //lay so du tai khoan
     const money = +accBal[0].AccountBalance + (+req.Data.Money); //cong voi tien can nap vo
     const entity = {
         AccountBalance: money
     }
-    const ret = await AccNumModel.updateMoney(+req.Data.UserID, entity); //update lai so du tai khoan
+    const ret = await AccNumModel.updateMoney(id[0].UserID, entity); //update lai so du tai khoan
     //response ret ve cho ngan hang B
     //encrypted va ky goi tin gui ve cho ngan hang B
     const encryptDecryptFunction = async() => {
