@@ -184,7 +184,9 @@ module.exports = {
     partnerCode: (req, res, next) => {
         const partnerCode = req.headers['x-partner-code'];
         //so sanh partnerCode
-        if (partnerCode === config.partner.partnerCodePGP || partnerCode === config.partner.partnerCodeRSA) {
+        if (partnerCode === config.partner.partnerCodePGP ||
+            partnerCode === config.partner.partnerCodeRSA ||
+            partnerCode === config.partner.testCode) {
             console.log('partnerCode: passed');
             next();
 
@@ -234,7 +236,7 @@ module.exports = {
         // put keys in backtick (``) to avoid errors caused by spaces or tab
         //public key cua ngan hang doi tac
         var NganHangBPublicKey;
-        if (code === 'xxxBankLovesyyyBank') { //neu la ngan hang dung PGP
+        if (code === config.partner.testCode) { //neu la ngan hang dung PGP
             NganHangBPublicKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: OpenPGP.js v4.10.4
 Comment: https://openpgpjs.org
@@ -291,7 +293,7 @@ DDUZuw5DQlTRk7NK1Kq1ZTIL0LlD4d1Zxa4IvyL+oOcJTxB05XE9R1bFzOU=
 =xag1
 -----END PGP PUBLIC KEY BLOCK-----`;
 
-        } else if (code === 'sacombank') { //neu la ngan hang dung RSA
+        } else if (code === config.partner.partnerCodeRSA) { //neu la ngan hang dung RSA
             NganHangBPublicKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: Keybase OpenPGP v1.0.0
 Comment: https://keybase.io/crypto
@@ -324,6 +326,30 @@ gmsnnyoUpUbVA/0bAhYchn00PaR9A60r0Tu+vdKW/Eh3cqwrYbtwm3WE5pipOuvd
 ZNdWTnvOiG7+wdM3DbR/ANOP9zIZ5GcpOF0zGlrUjxV38nOiS6xdPA1es63drLq6
 fs3cH8Lv0BwTkiAjcJXlpRi8vKPnoZTbtoV5Czt/eNjzrlrgEe44T+A6Ww==
 =2KAC
+-----END PGP PUBLIC KEY BLOCK-----`;
+        } else if (code === config.partner.partnerCodePGP) {
+            NganHangBPublicKey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mQGNBF7Ljp8BDADVhLpu9FIp//udLX/1pSAxA265wU4U3eoppfVkXPkOPROCRUsT
+uqnx12L4qtTQWtD3JhwkYa7ToW+3eXeODjyssr8g+NQUCFp6eaaY7XY1KOHQ4j9t
+iSrEJGZOf5orFI6SFv5gmv19/QiC/25k/g8QSmM/rfjXVrOQ8NfV/Hkehlr/hhkT
+w1ZNCnSKhe23fEm+ZdH1qDD1OmPR++f7ncMJi4psrU26FpEkLebdc5MJg0BlR6bq
+oKUHWs5YewcL4Y1aJX7FvvBMZN7OzIpeSq5zBOXb9A3wTONeRyVKArU5nhvV1iYV
+gYfNyCeBCvmZnMXTvpiClGWQX93u6Attu6c4OGvaMIwsUwbHSwxbzAw9Z0x2J3hS
+hqdFZTTpqvfUUuJEq9fUZPFp/YliD6qbfddpkF3LRNbiCegl+Sj0bKOL+kYgXLf9
+lJleI7Fmo9LPotjNP1nWv8a3wZOoz43XWmJ7SNvymloac9CzpbE7vJ2a/aTv5GMz
+cVfcgx3ZQ8w56a8AEQEAAbQfQW4gSG9hbmcgPGJlb2hvYW5nOThAZ21haWwuY29t
+PokBzgQTAQoAOBYhBHK0PbqfaB12AAzMX7rIeHGKps2IBQJey46fAhsDBQsJCAcC
+BhUKCQgLAgQWAgMBAh4BAheAAAoJELrIeHGKps2IYEAL/0RNdVp3485ciWfRp2/2
+UtLBC8LXvI7WEBYU6KrWSeQhsywNjMvG0XRofGSOer50g45JrwuWTgXJDKoYyVK2
+m1OMN/ZW2vuWVA4qJbs13PsUyOEORlpO8kz2SdZiBCtVpNVyeFiQhv8LPBmX9CjI
+g+sIpx9uVv8YsjHcqlLxHS8dRd1sh8xkiN+76QTdHfID1uCbQHCTDX08Y09L1qJL
+YPz6DqFoaV8SqYLiJREDV4jC6JGoYnFeWCK4hgvo4f4uN2lGC6pvItab4oLs9sNk
+iqWl3OFUpsach5OFIX6C8SG4xMgDRBRft6Pg9lb9SaYMSYq1gYwIJwlW4UzW1mGC
+9MDeulSxaLXVw3ff3Fjg4IQnaohTqsPCZcwPWz9NZs82EUqGgOdC2Fvz/McgF0IH
+tehFOtaHQor7bsEctWnX/SJh+iaH00CUyTl2AomEUY+KC7kwx8gj1n1XmHLZ7bXW
+LYQ99x51Z1Q4646ZLtLd1AwMUaShRJq/ssrRb3wYJmB1XA==
+=HAQR
 -----END PGP PUBLIC KEY BLOCK-----`;
         }
         //gan public key de qua route lay dung

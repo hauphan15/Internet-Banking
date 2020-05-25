@@ -193,6 +193,11 @@ router.post('/add', async function(req, res) {
         AccountBalance: money
     }
     const ret = await AccNumModel.updateMoney(id[0].UserID, entity); //update lai so du tai khoan
+    console.log(ret.changedRows);
+    var result;
+    if (ret.changedRows === 1) {
+        result = 'Successful Transaction';
+    }
     //response ret ve cho ngan hang B
     //encrypted va ky goi tin gui ve cho ngan hang B
     const encryptDecryptFunction = async() => {
@@ -201,7 +206,7 @@ router.post('/add', async function(req, res) {
 
 
         const options = {
-            message: openpgp.message.fromText(JSON.stringify(ret)), // input as Message object
+            message: openpgp.message.fromText(JSON.stringify(result)), // input as Message object
             publicKeys: (await openpgp.key.readArmored(req.NganHangBPublicKey)).keys, // for encryption
             privateKeys: [privKeyObj], // for signing (optional),
         }
