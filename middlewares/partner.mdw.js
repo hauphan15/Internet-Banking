@@ -3,6 +3,7 @@ const config = require('../config/default.json');
 const moment = require('moment');
 const CryptoJS = require('crypto-js');
 const openpgp = require('openpgp');
+const crypto = require('crypto');
 
 //cac key cua ngan hang phan van hau
 const pubkey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -220,7 +221,9 @@ module.exports = {
         };
         console.log(obj);
         //hash obj chua req.body va time
-        const hash = CryptoJS.MD5(JSON.stringify(obj), config.partner.SecretKey).toString();
+        //const hash = CryptoJS.MD5(JSON.stringify(obj), config.partner.SecretKey).toString();
+        const hash = crypto.createHmac('md5', config.partner.SecretKey).update(JSON.stringify(obj)).digest('hex');
+
         if (partnerSig === hash) {
             console.log('partnerSig: passed')
             next();
