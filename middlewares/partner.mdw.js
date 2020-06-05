@@ -1,7 +1,6 @@
 const createError = require('http-errors');
 const config = require('../config/default.json');
 const moment = require('moment');
-const CryptoJS = require('crypto-js');
 const openpgp = require('openpgp');
 const crypto = require('crypto');
 

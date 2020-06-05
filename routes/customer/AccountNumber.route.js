@@ -1,5 +1,5 @@
 const express = require('express');
-const AccNumModel = require('../models/AccountNumber.model');
+const AccNumModel = require('../../models/AccountNumber.model');
 const createError = require('http-errors');
 const openpgp = require('openpgp');
 
@@ -183,20 +183,37 @@ const router = express.Router();
 
 router.post('/add', async function(req, res) {
     const id = await AccNumModel.singleByNumber(req.Data.Number);
-    if (id.length <= 0) {
-        res.send('Number not found');
+
+    var result;
+
+    if (id.length === 0) {
+        result = {
+            success: false,
+            message: 'Number not found'
+        }
+        res.send(result);
         throw createError(401, 'Number not found');
     }
     const accBal = await AccNumModel.singleById(id[0].UserID); //lay so du tai khoan
     const money = +accBal[0].AccountBalance + (+req.Data.Money); //cong voi tien can nap vo
+
     const entity = {
         AccountBalance: money
     }
+
     const ret = await AccNumModel.updateMoney(id[0].UserID, entity); //update lai so du tai khoan
     console.log(ret.changedRows);
-    var result;
+
     if (ret.changedRows === 1) {
-        result = 'Successful Transaction';
+        result = {
+            success: true,
+            message: 'Successful Transaction'
+        }
+    } else {
+        result = {
+            success: false,
+            message: 'Failed Transaction'
+        }
     }
     //response ret ve cho ngan hang B
     //encrypted va ky goi tin gui ve cho ngan hang B

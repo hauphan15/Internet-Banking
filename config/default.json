@@ -25,5 +25,10 @@
         "user": "b2145fe2686b76",
         "password": "b40f490f",
         "database": "heroku_9c815e43c50021f"
+    },
+    "token": {
+        "secret": "secretKey",
+        "expiresIn": "10m",
+        "refreshTokenSz": 80
     }
 }
