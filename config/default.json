@@ -30,5 +30,9 @@
         "secret": "secretKey",
         "expiresIn": "10m",
         "refreshTokenSz": 80
+    },
+    "transaction": {
+        "InternaBank": 1000,
+        "ExternalBank": 3000
     }
 }

@@ -12,12 +12,13 @@ module.exports = {
         //     "FullName": "",
         //     "UserEmail": "",
         //     "UserPhone": "",
-        //     "Number": "",
         // }
         const hash = bcrypt.hashSync(entity.UserPassword, 8);
         entity.UserPassword = hash;
         return db.add('useraccounts', entity);
     },
+
+    latestUserId: _ => db.load(`SELECT MAX(UserID) FROM useraccounts`),
 
     singleById: id => db.load(`SELECT * FROM useraccounts WHERE UserID = ${id}`),
 

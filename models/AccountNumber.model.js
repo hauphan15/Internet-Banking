@@ -7,5 +7,14 @@ module.exports = {
 
     singleByNumber: number => db.load(`SELECT * FROM AccountNumbers WHERE Number = '${number}'  `),
 
-    updateMoney: (id, entity) => db.update('AccountNumbers', 'UserID', id, entity)
+    updateMoney: (id, entity) => db.update('AccountNumbers', 'UserID', id, entity),
+
+    add: entity => {
+        // entity = {
+        //     "UserID": "",
+        //     "AccountBalance": "",
+        //     "Number": ""
+        // }
+        return db.add('AccountNumbers', entity);
+    },
 };

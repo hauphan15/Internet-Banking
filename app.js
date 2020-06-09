@@ -21,13 +21,24 @@ app.get('/', function(req, res) {
     res.send('Hello from Mrhauphan !!');
 })
 
+//api infor
 app.use('/user-account', verifyPartner.partnerCode, verifyPartner.partnerTime, verifyPartner.partnerSig, require('./routes/customer/UserAccount.route'));
 
+//api add money
 app.use('/account-number', verifyPartner.partnerCode, verifyPartner.partnerTime, verifyPartner.partnerSig, verifyPartner.partnerAsymmetricSig, require('./routes/customer/AccountNumber.route'));
 
+//login and ...
 app.use('/user', require('./routes/customer/UserAccount.route'));
 
+//register and ...
+app.use('/employee', require('./routes/employee/CreateCustomerAcc.route'));
+
+//get all user
 app.use('/user-all', verifyToken, require('./routes/customer/UserAccount.route'));
+
+//transaction
+app.use('/customer', require('./routes/customer/Transaction.route'));
+
 
 app.use((req, res, next) => {
     res.status(404).send('NOT FOUND');
