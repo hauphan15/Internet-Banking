@@ -1,9 +1,9 @@
 const express = require('express');
 const userAccountModel = require('../../models/UserAccount.model');
 const createError = require('http-errors');
-const jwt = require('jsonwebtoken');
-const config = require('../../config/default.json');
-const randToken = require('rand-token');
+const SavingAccModel = require('../../models/SavingAccount.model');
+const AccNumberModel = require('../../models/AccountNumber.model');
+const TransactionModel = require('../../models/Transaction.model');
 
 const router = express.Router();
 
@@ -15,6 +15,51 @@ router.get('/', async(req, res) => {
     res.json(ret);
 })
 
+//lấy tất cả tài khoản tiết kiệm và tài khoản thanh toán của khách
+router.post('/:userid', async(req, res) => {
+    // req.body = {
+    //     "UserID": ""
+    // }
+
+    const savingAcc = await SavingAccModel.singleByUserId(req.params.userid);
+
+    const spendingAcc = await AccNumberModel.singleById(req.params.userid);
+
+    res.send({
+        SpendingAccount: spendingAcc,
+        SavingAccount: savingAcc
+    })
+
+})
+
+//giao dịch nhân tiền
+router.post('/history/take', async(req, res) => {
+    // req.body = {
+    //     "UserID": ""
+    // }
+
+    const history = await TransactionModel.allTakeTrans(req.body.Number);
+    res.send(history);
+})
+
+//giao dịch chuyển tiền
+router.post('/history/send', async(req, res) => {
+    // req.body = {
+    //     "UserID": ""
+    // }
+
+    const history = await TransactionModel.allSendTrans(req.body.Number);
+    res.send(history);
+})
+
+//giao dịch về nhắc nợ | trả nợ người khác hoặc người khác trả nợ
+router.post('/history/debt', async(req, res) => {
+    // req.body = {
+    //     "UserID": ""
+    // }
+    const history = await TransactionModel.allDebTrans(req.body.Number);
+    res.send(history);
+})
 
 //API that response user's informations for partner bank
 router.post('/info', async function(req, res) {
@@ -34,42 +79,5 @@ router.post('/info', async function(req, res) {
     });
 })
 
-//Customer login
-router.post('/login', async(req, res) => {
-    // req.body = {
-    //   "UserName": "mr.hauphan",
-    //   "UserPassword": "mr.hauphan"
-    // }
-
-    const ret = await userAccountModel.login(req.body);
-    if (ret === null) {
-        return res.json({
-            authenticated: false
-        })
-    }
-
-    const UserID = ret.UserID;
-
-    const accessToken = generateAccessToken(UserID);
-
-    const refreshToken = randToken.generate(config.token.refreshTokenSz);
-    await userAccountModel.updateRefreshToken(UserID, refreshToken);
-
-    res.json({
-        authenticated: true,
-        accessToken,
-        refreshToken
-    })
-})
-
-//generate token with jwt module
-const generateAccessToken = UserID => {
-    const payload = { UserID };
-    const accessToken = jwt.sign(payload, config.token.secret, {
-        expiresIn: config.token.expiresIn
-    });
-
-    return accessToken;
-}
 
 module.exports = router;

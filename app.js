@@ -33,14 +33,14 @@ app.use('/partner-pgp', require('./routes/partner/PGPBank.route'));
 //goi api ngân hàng rsa
 app.use('/partner-rsa', require('./routes/partner/PGPBank.route'));
 
-//login and ...
-app.use('/user', require('./routes/customer/UserAccount.route'));
+//login
+app.use('/login', require('./routes/login/Login.route'));
 
 //register and ...
 app.use('/employee', require('./routes/employee/CreateCustomerAcc.route'));
 
-//get all user
-app.use('/user-all', verifyToken, require('./routes/customer/UserAccount.route'));
+//customer account
+app.use('/customer', verifyToken, require('./routes/customer/UserAccount.route'));
 
 //takerlist
 app.use('/customer', require('./routes/customer/TakerList.route'));
