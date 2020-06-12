@@ -183,6 +183,7 @@ module.exports = {
 
     partnerCode: (req, res, next) => {
         const partnerCode = req.headers['x-partner-code'];
+        req.PartnerBank = partnerCode;
         //so sanh partnerCode
         if (partnerCode === config.partner.partnerCodePGP ||
             partnerCode === config.partner.partnerCodeRSA ||

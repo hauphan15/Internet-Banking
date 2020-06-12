@@ -21,11 +21,17 @@ app.get('/', function(req, res) {
     res.send('Hello from Mrhauphan !!');
 })
 
-//api infor
+//api cho partner goi infor
 app.use('/user-account', verifyPartner.partnerCode, verifyPartner.partnerTime, verifyPartner.partnerSig, require('./routes/customer/UserAccount.route'));
 
-//api add money
+//api cho partner chuyen tien 
 app.use('/account-number', verifyPartner.partnerCode, verifyPartner.partnerTime, verifyPartner.partnerSig, verifyPartner.partnerAsymmetricSig, require('./routes/customer/AccountNumber.route'));
+
+//goi api ngân hàng pgp
+app.use('/partner-pgp', require('./routes/partner/PGPBank.route'));
+
+//goi api ngân hàng rsa
+app.use('/partner-rsa', require('./routes/partner/PGPBank.route'));
 
 //login and ...
 app.use('/user', require('./routes/customer/UserAccount.route'));
@@ -36,8 +42,14 @@ app.use('/employee', require('./routes/employee/CreateCustomerAcc.route'));
 //get all user
 app.use('/user-all', verifyToken, require('./routes/customer/UserAccount.route'));
 
+//takerlist
+app.use('/customer', require('./routes/customer/TakerList.route'));
+
 //transaction
 app.use('/customer', require('./routes/customer/Transaction.route'));
+
+//administrator
+app.use('/admin', require('./routes/administrator/PartnerTrans.route'));
 
 
 app.use((req, res, next) => {

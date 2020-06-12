@@ -18,8 +18,6 @@ module.exports = {
         return db.add('useraccounts', entity);
     },
 
-    latestUserId: _ => db.load(`SELECT MAX(UserID) FROM useraccounts`),
-
     singleById: id => db.load(`SELECT * FROM useraccounts WHERE UserID = ${id}`),
 
     singleByNumber: number => db.load(`SELECT * FROM useraccounts WHERE Number = '${number}' `),

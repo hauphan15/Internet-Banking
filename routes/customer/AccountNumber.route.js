@@ -1,7 +1,9 @@
 const express = require('express');
 const AccNumModel = require('../../models/AccountNumber.model');
 const createError = require('http-errors');
+const PartnerTransModel = require('../../models/PartnerTransaction.model');
 const openpgp = require('openpgp');
+const moment = require('moment');
 
 //key cua ngan hang A pvhau
 const pubkey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
@@ -180,7 +182,7 @@ const passphrase = `mrhauphan`; //what the privKey is encrypted with
 
 const router = express.Router();
 
-
+//API DÀNH CHO NGÂN HÀNG ĐỐI TÁC CHUYỂN TIỀN VÀO
 router.post('/add', async function(req, res) {
     const id = await AccNumModel.singleByNumber(req.Data.Number);
 
@@ -208,7 +210,18 @@ router.post('/add', async function(req, res) {
         result = {
             success: true,
             message: 'Successful Transaction'
-        }
+        };
+
+        //add vào bảng PartnerTransactions
+        const transInfo = {
+            SendBank: req.PartnerBank,
+            TakeBank: 'HHBank',
+            Money: req.Data.Money,
+            Time: moment().format('YYYY-MM-DD hh:mm:ss')
+        };
+
+        await PartnerTransModel.add(transInfo);
+
     } else {
         result = {
             success: false,

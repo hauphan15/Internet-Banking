@@ -4,11 +4,27 @@ const TransModel = require('../../models/Transaction.model');
 const createError = require('http-errors');
 const moment = require('moment');
 const config = require('../../config/default.json');
+const nodemailer = require('nodemailer');
+const UserAccModel = require('../../models/UserAccount.model');
+
 
 const router = express.Router();
 
 
-router.post('/trans/add', async function(req, res) {
+let time;
+
+const createOTP = () => {
+    let OTPcode = '';
+    for (var i = 0; i < 6; i++) {
+        OTPcode += Math.floor(Math.random() * (9 - 0) + 0);
+    }
+    return OTPcode;
+}
+
+const OTP = createOTP();
+
+//GIAO DỊCH CHUYỂN TIỀN NỘI BỘ
+router.post('/transaction', async function(req, res) {
 
     // req.body = {
     //     Number_NG: '',
@@ -16,37 +32,41 @@ router.post('/trans/add', async function(req, res) {
     //     Content: '',
     //     Money: ''
     //     Fee:'NN' or 'NG'
+    //     Type: 'CHUYENKHOAN' 'NHACNO' | chuyển tiền - nhắc nợ
     // };
+
+
+    //Xác thực mã OTP
+
+    let checkTime = moment().unix() - time; //kiểm tra hiệu lực mã OTP còn hiệu lực ko
+
+    console.log(req.headers['x-otp-code']);
+
+    const optHeader = req.headers['x-otp-code'];
+
+    if (+optHeader !== +OTP || checkTime > 7200) { // 7200s == 3h
+        res.send({
+            message: 'Invalid OTP code or expired OPT code'
+        })
+        throw createError(401, 'Invalid OTP code or expired OPT code');
+    }
 
     const transInfo = {
         ...req.body,
-        Type: 'CT',
         Time: moment().format('YYYY-MM-DD hh:mm:ss')
-        ``
     };
 
     const takerInfo = await AccNumModel.singleByNumber(req.body.Number_NN);
-    console.log(takerInfo);
+
     const senderInfo = await AccNumModel.singleByNumber(req.body.Number_NG);
-    console.log(senderInfo);
 
     var result;
-
-    //ktra tài khoản người nhận có tồn tại
-    if (takerInfo.length === 0) {
-        result = {
-            success: false,
-            message: 'TakerNumber not found'
-        }
-        res.send(result);
-        throw createError(401, 'TakerNumber not found');
-    }
 
 
     //ktra số dư người gửi
     if (req.body.Fee === 'NG') {
-        if (+senderInfo.AccountBalance < (+req.body.Money + +config.transaction.InternaBank)) {
-            result = {
+        if (+senderInfo[0].AccountBalance < (+req.body.Money + +config.transaction.InternaBank)) { //số dư có bé hơn tiền gửi + phí hay k
+            result = { //TH ng gửi trả phí
                 success: false,
                 message: 'Balance is not enough for the transaction'
             }
@@ -54,7 +74,7 @@ router.post('/trans/add', async function(req, res) {
             throw createError(401, 'Balance is not enough for the transaction');
         }
     } else {
-        if (+senderInfo.AccountBalance < +req.body.Money) {
+        if (+senderInfo[0].AccountBalance < +req.body.Money) { //số dư có bé tiền gửi,TH gửi nhận trả phí
             result = {
                 success: false,
                 message: 'Balance is not enough for the transaction'
@@ -74,6 +94,7 @@ router.post('/trans/add', async function(req, res) {
         throw createError(401, 'SenderNumber not found');
     }
 
+
     //TÀI KHOẢN NGƯỜI NHẬN
     //cộng với tiền nạp dô
     let takerBalance = +takerInfo[0].AccountBalance + (+req.body.Money);
@@ -88,7 +109,6 @@ router.post('/trans/add', async function(req, res) {
     };
     //update lai so du tai khoan
     const ret1 = await AccNumModel.updateMoney(takerInfo[0].UserID, newBalance1);
-
 
 
     //TÀI KHOẢN NGƯỜI GỬI
@@ -119,12 +139,58 @@ router.post('/trans/add', async function(req, res) {
         }
     }
 
-
-    //LƯU LẠI LỊCH SỬ GIAO DỊCH 
+    //lưu lại lịch sử giao dịch
     await TransModel.add(transInfo);
 
     //response trả về
     res.send(result);
+})
+
+
+
+//GỬI MÃ OPT
+router.post('/otp', async(req, res) => {
+
+    const senderInfo = await UserAccModel.singleByNumber(req.body.Number);
+
+    //email người gửi
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'hhbank.service@gmail.com',
+            pass: 'hhbank123456'
+        }
+    });
+
+    console.log(`gmail: ${senderInfo[0].UserEmail}`);
+
+    //email người nhận
+    const mailOptions = {
+        from: 'hhbank.service@gmail.com',
+        to: senderInfo[0].UserEmail,
+        subject: 'OTP Verification - HHBank',
+        text: `Dear ${senderInfo[0].UserName}
+         This is your OTP code for validating the transaction: ${OTP}
+         This code will expire 2 hours later
+        `
+    };
+    transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+            console.log(error);
+            res.send({
+                success: false,
+                message: error,
+            })
+            throw createError(401, 'Can not send email');
+        }
+        console.log('Email sent: ' + info.response);
+        time = moment().unix();
+    });
+
+    res.send({
+        success: true,
+        OTP
+    });
 })
 
 
