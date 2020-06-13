@@ -62,7 +62,7 @@ router.post('/history/debt', async(req, res) => {
 
 
 //đổi mật khẩu
-router.post('/changepw', (req, res) => {
+router.post('/changepw', async(req, res) => {
     // req.body = {
     //     "UserID": ""
     //     "OldPassword":""
@@ -124,7 +124,7 @@ const createOTP = () => {
 
 const OTP = createOTP();
 
-router.post('/misspw', (req, res) => {
+router.post('/misspw', async (req, res) => {
     // req.body = {
     //     "UserID": ""
     //     "NewPassword":""

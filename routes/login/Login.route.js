@@ -23,12 +23,12 @@ router.post('/login', async(req, res) => {
         })
     }
 
-    const employeeId = ret.employeeId;
+    const UserID = ret.UserID;
 
-    const accessToken = generateAccessToken(employeeId);
+    const accessToken = generateAccessToken(UserID);
 
     const refreshToken = randToken.generate(config.token.refreshTokenSz);
-    await userAccountModel.updateRefreshToken(employeeId, refreshToken);
+    await userAccountModel.updateRefreshToken(UserID, refreshToken);
 
     res.json({
         authenticated: true,
@@ -158,29 +158,12 @@ router.post('/admin-refresh', async(req, res) => {
 
 const generateAccessToken = employeeId => {
     const payload = { employeeId };
-    const accessToken = jwt.sign(payload, config.auth.secret, {
-        expiresIn: config.auth.expiresIn
-    });
-
-    return accessToken;
-}
-
-
-
-
-
-
-
-
-
-//generate token with jwt module
-const generateAccessToken = employeeId => {
-    const payload = { employeeId };
     const accessToken = jwt.sign(payload, config.token.secret, {
         expiresIn: config.token.expiresIn
     });
 
     return accessToken;
 }
+
 
 module.exports = router;
