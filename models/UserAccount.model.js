@@ -41,6 +41,16 @@ module.exports = {
         return null;
     },
 
+    updatePassword: async entity => {
+        // entity = {
+        //   "UserID": "",
+        //   "NewPassword": ""
+        // }
+
+        const hash = bcrypt.hashSync(entity.NewPassword, 8);
+        return db.update('useraccounts', 'UserID', entity.UserID, { UserPassword: hash });
+    },
+
     updateRefreshToken: async(userId, token) => {
 
         await db.del('userrefreshtokenext', { UserID: userId });

@@ -19,5 +19,15 @@ module.exports = {
 
     delete: id => db.del('partnertransactions', { ID: id }),
 
-    update: (id, entity) => db.update('partnertransactions', 'ID', id, entity)
+    update: (id, entity) => db.update('partnertransactions', 'ID', id, entity),
+
+    byDate: entity => db.load(
+        `SELECT *
+        FROM partnertransactions
+        WHERE (Time BETWEEN '${entity.from}' AND '${entity.to}') `),
+
+    byPartnerBank: partner => db.load(
+        `SELECT * 
+        FROM partnertransactions 
+        WHERE SendBank = '${partner}' OR TakeBank = '${partner}' `)
 }

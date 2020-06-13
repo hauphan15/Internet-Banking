@@ -35,12 +35,9 @@ router.post('/transaction', async function(req, res) {
     //     Type: 'CHUYENKHOAN' 'NHACNO' | chuyển tiền - nhắc nợ
     // };
 
-
     //Xác thực mã OTP
 
     let checkTime = moment().unix() - time; //kiểm tra hiệu lực mã OTP còn hiệu lực ko
-
-    console.log(req.headers['x-otp-code']);
 
     const optHeader = req.headers['x-otp-code'];
 

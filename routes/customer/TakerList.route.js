@@ -5,10 +5,22 @@ const UserAccModel = require('../../models/UserAccount.model');
 
 const router = express.Router();
 
+router.get('/', async(req, res) => {
+    const result = await TakerListModel.all();
+
+    if (result.length === 0) {
+        return res.send({
+            message: 'Empty'
+        })
+    }
+
+    res.send(result);
+})
+
+
 //thêm người nhận
 router.post('/add', async(req, res) => {
     // req.body = {
-    //     "UserID": "",
     //     "Number": "",
     //     "Name": ""
     // };
@@ -28,7 +40,6 @@ router.post('/add', async(req, res) => {
     }
 
     const taker = {
-        UserID: req.body.UserID,
         Number: req.body.Number,
         Name: name
     }
@@ -37,8 +48,7 @@ router.post('/add', async(req, res) => {
 
     res.status(201).json({
         ID: retAdd.insertId,
-        Name: name,
-        UserID: req.body.UserID
+        Name: name
     });
 })
 
@@ -67,9 +77,11 @@ router.post('/update', async(req, res) => {
     let number = req.body.Number;
     let name = req.body.Name;
 
+    //nếu ko update number
     if (number === '') {
         number = info[0].Number;
     }
+    //nếu không update name
     if (name === '') {
         name = info[0].Name;
     }
