@@ -3,15 +3,15 @@ const bcrypt = require('bcryptjs');
 const moment = require('moment');
 
 module.exports = {
-    all: _ => db.load('SELECT * FROM employees'),
+    all: _ => db.load('SELECT * FROM adminaccount'),
 
-    singleById: id => db.load(`SELECT * FROM employees WHERE ID = ${id}`),
+    singleById: id => db.load(`SELECT * FROM adminaccount WHERE ID = ${id}`),
 
-    singleByUserName: username => db.load(`SELECT * FROM employees WHERE UserName = '${username}'  `),
+    singleByUserName: username => db.load(`SELECT * FROM adminaccount WHERE UserName = '${username}'  `),
 
-    updateInfo: (id, entity) => db.update('employees', 'ID', id, entity),
+    updateInfo: (id, entity) => db.update('adminaccount', 'ID', id, entity),
 
-    delete: id => db.del('employees', { ID: id }),
+    delete: id => db.del('adminaccount', { ID: id }),
 
     add: entity => {
         // entity = {
@@ -25,7 +25,7 @@ module.exports = {
 
         const hash = bcrypt.hashSync(entity.Password, 8);
         entity.Password = hash;
-        return db.add('employees', entity);
+        return db.add('adminaccount', entity);
     },
 
     login: async entity => {
@@ -33,7 +33,7 @@ module.exports = {
         //   "UserName": "",
         //   "UserPassword": ""
         // }
-        const rows = await db.load(`SELECT * FROM employees WHERE UserName = '${entity.UserName}' `);
+        const rows = await db.load(`SELECT * FROM adminaccount WHERE UserName = '${entity.UserName}' `);
         if (rows.length === 0)
             return null;
 
@@ -45,20 +45,20 @@ module.exports = {
         return null;
     },
 
-    updateRefreshToken: async(employeeId, token) => {
+    updateRefreshToken: async(adminId, token) => {
 
-        await db.del('employeefreshtokenext', { ID: employeeId });
+        await db.del('adminfreshtokenext', { ID: adminId });
 
         const entity = {
-            ID: employeeId,
+            ID: adminId,
             RefreshToken: token,
             Rdt: moment().format('YYYY-MM-DD HH:mm:ss')
         }
-        return db.add('employeefreshtokenext', entity);
+        return db.add('adminrefreshtokenext', entity);
     },
 
-    verifyRefreshToken: async(employeeId, token) => {
-        const sql = `SELECT * FROM employeefreshtokenext WHERE ID = ${employeeId} and RefreshToken = '${token}'`;
+    verifyRefreshToken: async(adminId, token) => {
+        const sql = `SELECT * FROM adminrefreshtokenext WHERE ID = ${adminId} and RefreshToken = '${token}'`;
         const rows = await db.load(sql);
         if (rows.length > 0)
             return true;
