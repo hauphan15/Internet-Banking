@@ -48,6 +48,8 @@ app.use('/customer', require('./routes/customer/TakerList.route'));
 //transaction
 app.use('/customer', require('./routes/customer/Transaction.route'));
 
+app.use('/customer/nhacno', verifyToken, require('./routes/customer/Nhacno.route'));
+
 //giao dịch với ngân hàng đối tác
 app.use('/admin', require('./routes/administrator/PartnerTrans.route'));
 

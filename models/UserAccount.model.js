@@ -64,7 +64,7 @@ module.exports = {
     },
 
     verifyRefreshToken: async(userId, token) => {
-        const sql = `SELECT * FROM userrefreshtokenext WHERE ID = ${userId} and RefreshToken = '${token}'`;
+        const sql = `SELECT * FROM userrefreshtokenext WHERE UserID = ${userId} and RefreshToken = '${token}'`;
         const rows = await db.load(sql);
         if (rows.length > 0)
             return true;

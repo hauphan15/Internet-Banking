@@ -7,6 +7,7 @@ module.exports = function(req, res, next) {
 
     const token = req.headers['x-access-token'];
 
+
     if (token) {
         jwt.verify(token, config.token.secret, function(err, payload) {
             if (err) {
