@@ -146,7 +146,7 @@ router.post('/transaction', async function(req, res) {
 
 
 //GỬI MÃ OPT
-router.post('/otp', async(req, res) => {
+router.post('/trans/otp', async(req, res) => {
 
     const senderInfo = await UserAccModel.singleByNumber(req.body.Number);
 

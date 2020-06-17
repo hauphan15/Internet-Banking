@@ -124,7 +124,7 @@ const createOTP = () => {
 
 const OTP = createOTP();
 
-router.post('/misspw', async (req, res) => {
+router.post('/misspw', async(req, res) => {
     // req.body = {
     //     "UserID": ""
     //     "NewPassword":""
@@ -198,7 +198,7 @@ router.post('/info', async function(req, res) {
 
 
 //GỬI MÃ OPT
-router.post('/otp', async(req, res) => {
+router.post('/misspw/otp', async(req, res) => {
 
     const senderInfo = await UserAccModel.singleByNumber(req.body.Number);
 
@@ -219,8 +219,8 @@ router.post('/otp', async(req, res) => {
         to: senderInfo[0].UserEmail,
         subject: 'OTP Verification - HHBank',
         text: `Dear ${senderInfo[0].UserName}
-         This is your OTP code for validating the transaction: ${OTP}
-         This code will expire 2 hours later
+         This is your OTP code for changing password: ${OTP}
+         This code will expire 5 minutes later
         `
     };
     transporter.sendMail(mailOptions, function(error, info) {

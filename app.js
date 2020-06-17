@@ -36,11 +36,14 @@ app.use('/partner-rsa', require('./routes/partner/PGPBank.route'));
 //login and refresh token
 app.use('/login', require('./routes/login/Login.route'));
 
-//employee
+//employee create acc
 app.use('/employee', require('./routes/employee/CreateCustomerAcc.route'));
 
+//employee transaction
+app.use('/employee', require('./routes/employee/CustomerTrans.route'));
+
 //customer account
-app.use('/customer', verifyToken, require('./routes/customer/UserAccount.route'));
+app.use('/customer', require('./routes/customer/UserAccount.route'));
 
 //takerlist
 app.use('/customer', require('./routes/customer/TakerList.route'));
@@ -48,7 +51,7 @@ app.use('/customer', require('./routes/customer/TakerList.route'));
 //transaction
 app.use('/customer', require('./routes/customer/Transaction.route'));
 
-app.use('/customer/nhacno', verifyToken, require('./routes/customer/Nhacno.route'));
+app.use('/customer/nhacno', require('./routes/customer/Nhacno.route'));
 
 //giao dịch với ngân hàng đối tác
 app.use('/admin', require('./routes/administrator/PartnerTrans.route'));

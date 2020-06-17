@@ -9,6 +9,15 @@ const router = express.Router();
 
 //create an account by employee
 router.post('/create-acc', async(req, res) => {
+    // req.body = {
+    //     "UserName": "",
+    //     "Password": "",
+    //     "FullName": "",
+    //     "Email": "",
+    //     "Phone": ""
+    // }
+
+    console.log(req.body);
 
     //kiểm tra username
     const usrname = await UserAccModel.singleByUserName(req.body.UserName);
