@@ -31,7 +31,7 @@ app.use('/account-number', verifyPartner.partnerCode, verifyPartner.partnerTime,
 app.use('/partner-pgp', require('./routes/partner/PGPBank.route'));
 
 //goi api ngân hàng rsa
-app.use('/partner-rsa', require('./routes/partner/PGPBank.route'));
+app.use('/partner-rsa', require('./routes/partner/RSABank.route'));
 
 //login and refresh token
 app.use('/login', require('./routes/login/Login.route'));
@@ -46,7 +46,7 @@ app.use('/employee', require('./routes/employee/CustomerTrans.route'));
 app.use('/customer', require('./routes/customer/UserAccount.route'));
 
 //takerlist
-app.use('/customer', require('./routes/customer/TakerList.route'));
+app.use('/customer/takerlist', require('./routes/customer/TakerList.route'));
 
 //transaction
 app.use('/customer', require('./routes/customer/Transaction.route'));

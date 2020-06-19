@@ -1,14 +1,21 @@
 const express = require('express');
 const PartnerTransModel = require('../../models/PartnerTransaction.model');
+const TransModel = require('../../models/Transaction.model');
 const md5 = require("md5");
 const NodeRSA = require("node-rsa");
 const axios = require('axios');
 const moment = require('moment');
 const AccNumModel = require('../../models/AccountNumber.model');
+const UserAccModel = require('../../models/UserAccount.model');
+const nodemailer = require('nodemailer');
+const config = require('../../config/default.json');
 
 const router = express.Router();
 
-router.post('/getInfo', (req, res) => {
+router.post('/getInfo', async(req, res) => {
+    // req.bodu = {
+    //     "Number": ""
+    // }
 
     let info;
 
@@ -45,7 +52,7 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
     console.log("INFO: ");
     console.log('x-partner-code:', bankName);
     let content_info = {
-        number: req.body.number
+        number: req.body.Number
     };
 
     const key = new NodeRSA(rsaPubkey);
@@ -61,7 +68,7 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
     };
     const sign_info = md5(ts.toString() + JSON.stringify(content_info) + 'sacombank-linking-code'); ///hash md5 de lay partner-sig
 
-    async function makePostRequest() {
+    function makePostRequest() {
         axios.post('https://sacombank-internet-banking.herokuapp.com/services/accounts/info', {
                 message: content_info.message
             }, {
@@ -71,20 +78,20 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
                     'x-timestamp': ts
                 }
             })
-            .then(async function(response) {
-                console.log(response.data);
+            .then(function(response) {
                 dt = response.data;
                 const decryptedMessage = Private_Key.decrypt(dt.messageResponse, 'utf8')
                 console.log(JSON.parse(decryptedMessage));
-                info = decryptedMessage;
+                return res.json({
+                    data: JSON.parse(decryptedMessage)
+                })
             })
             .catch(function(error) {
                 console.log(error);
+                return res.json(error);
             });
     }
     makePostRequest();
-    console.log(info);
-    res.send(info);
 })
 
 
@@ -180,7 +187,6 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
     const key = new NodeRSA(rsaPubkey);
 
     const ts = Date.now();
-    console.log('x-timestamp:', ts); //timestamp
 
     //request gui nap tien
     const content_transfer = {
@@ -202,8 +208,6 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
 
     //partner-sig
     const sign_transfer_hhbank = md5(ts.toString() + JSON.stringify(content_transfer_hhbank) + 'sacombank-linking-code');
-    console.log('x-partner-sign:', sign_transfer_hhbank);
-    console.log('body', JSON.stringify(content_transfer_hhbank));
 
     function makePostRequest() {
         axios.post('https://sacombank-internet-banking.herokuapp.com/services/accounts/transfer', {
@@ -217,9 +221,7 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
                 }
             })
             .then(function(response) {
-                console.log(response.data);
                 dt = response.data;
-
                 const decryptedMessage = Private_Key.decrypt(dt.messageResponse, 'utf8');
                 console.log(JSON.parse(decryptedMessage));
                 re = decryptedMessage;
@@ -262,14 +264,15 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
     const transInfoPartner = {
         SendBank: 'HHBank',
         TakeBank: 'Sacombank',
-        Money: req.body.amount,
+        Money: req.body.Money,
         Time: moment().format('YYYY-MM-DD hh:mm:ss')
     };
 
     await PartnerTransModel.add(transInfoPartner);
 
-    console.log(rp);
-    res.send(rp);
+    res.send({
+        message: 'Successful Transaction'
+    });
 })
 
 

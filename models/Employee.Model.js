@@ -16,15 +16,15 @@ module.exports = {
     add: entity => {
         // entity = {
         //     "UserName": "",
-        //     "Password": "",
+        //     "UserPassword": "",
         //     "FullName": "",
         //     "Email": "",
         //     "Phone": "",
         //     "DoB": "",
         // }
 
-        const hash = bcrypt.hashSync(entity.Password, 8);
-        entity.Password = hash;
+        const hash = bcrypt.hashSync(entity.UserPassword, 8);
+        entity.UserPassword = hash;
         return db.add('employees', entity);
     },
 
@@ -47,18 +47,18 @@ module.exports = {
 
     updateRefreshToken: async(employeeId, token) => {
 
-        await db.del('employeefreshtokenext', { ID: employeeId });
+        await db.del('employeerefreshtokenext', { ID: employeeId });
 
         const entity = {
             ID: employeeId,
             RefreshToken: token,
             Rdt: moment().format('YYYY-MM-DD HH:mm:ss')
         }
-        return db.add('employeefreshtokenext', entity);
+        return db.add('employeerefreshtokenext', entity);
     },
 
     verifyRefreshToken: async(employeeId, token) => {
-        const sql = `SELECT * FROM employeefreshtokenext WHERE ID = ${employeeId} and RefreshToken = '${token}'`;
+        const sql = `SELECT * FROM employeerefreshtokenext WHERE ID = ${employeeId} and RefreshToken = '${token}'`;
         const rows = await db.load(sql);
         if (rows.length > 0)
             return true;

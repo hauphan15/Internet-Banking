@@ -6,6 +6,7 @@ const AccNumberModel = require('../../models/AccountNumber.model');
 const TransactionModel = require('../../models/Transaction.model');
 const bcrypt = require('bcryptjs');
 
+
 const router = express.Router();
 
 //Get all user
@@ -16,19 +17,18 @@ router.get('/', async(req, res) => {
     res.json(ret);
 })
 
-//lấy tất cả tài khoản tiết kiệm và tài khoản thanh toán của khách
-router.post('/account/:userid', async(req, res) => {
-
-    const savingAcc = await SavingAccModel.singleByUserId(req.params.userid);
-
-    const spendingAcc = await AccNumberModel.singleById(req.params.userid);
-
-    res.send({
-        SpendingAccount: spendingAcc,
-        SavingAccount: savingAcc
-    })
-
+//lấy tài khoảng thanh toán
+router.post('/account/spending', async(req, res) => {
+    const spendingAcc = await AccNumberModel.singleById(req.body.UserID);
+    res.send(spendingAcc);
 })
+
+//lấy tài khoản tiết kiệm
+router.post('/account/saving', async(req, res) => {
+    const savingAcc = await SavingAccModel.singleByUserId(req.body.UserID);
+    res.send(savingAcc);
+})
+
 
 // THỐNG KÊ GIAO DỊCH
 //giao dịch nhân tiền

@@ -16,15 +16,15 @@ module.exports = {
     add: entity => {
         // entity = {
         //     "UserName": "",
-        //     "Password": "",
+        //     "UserPassword": "",
         //     "FullName": "",
         //     "Email": "",
         //     "Phone": "",
         //     "DoB": "",
         // }
 
-        const hash = bcrypt.hashSync(entity.Password, 8);
-        entity.Password = hash;
+        const hash = bcrypt.hashSync(entity.UserPassword, 8);
+        entity.UserPassword = hash;
         return db.add('adminaccount', entity);
     },
 
@@ -47,7 +47,7 @@ module.exports = {
 
     updateRefreshToken: async(adminId, token) => {
 
-        await db.del('adminfreshtokenext', { ID: adminId });
+        await db.del('adminrefreshtokenext', { ID: adminId });
 
         const entity = {
             ID: adminId,

@@ -5,14 +5,12 @@ const UserAccModel = require('../../models/UserAccount.model');
 
 const router = express.Router();
 
-router.get('/', async(req, res) => {
-    const result = await TakerListModel.all();
+router.post('/', async(req, res) => {
+    // req.body = {
+    //     "UserID": ""
+    // }
 
-    if (result.length === 0) {
-        return res.send({
-            message: 'Empty'
-        })
-    }
+    const result = await TakerListModel.singleByUserId(req.body.UserID);
 
     res.send(result);
 })
@@ -21,6 +19,7 @@ router.get('/', async(req, res) => {
 //thêm người nhận
 router.post('/add', async(req, res) => {
     // req.body = {
+    //     "UserID": "",
     //     "Number": "",
     //     "Name": ""
     // };
@@ -29,6 +28,7 @@ router.post('/add', async(req, res) => {
     //kiểm tra tài khoản người nhận có hợp lệ
     if (info.length === 0) {
         return res.send({
+            success: false,
             message: 'Invalid TakerNumber'
         })
     }
@@ -40,15 +40,18 @@ router.post('/add', async(req, res) => {
     }
 
     const taker = {
+        UserID: req.body.UserID,
         Number: req.body.Number,
         Name: name
     }
 
     const retAdd = await TakerListModel.add(taker);
-
+    const takerName = await TakerListModel.singleById(retAdd.insertId);
     res.status(201).json({
         ID: retAdd.insertId,
-        Name: name
+        UserID: req.body.UserID,
+        Number: req.body.Number,
+        Name: takerName[0].Name
     });
 })
 

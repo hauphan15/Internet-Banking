@@ -33,8 +33,7 @@ router.post("/login", async(req, res) => {
         authenticated: true,
         accessToken,
         refreshToken,
-        UserID,
-        FullName: ret.FullName,
+        user: ret
     });
 });
 
@@ -63,6 +62,7 @@ router.post("/employee-login", async(req, res) => {
         authenticated: true,
         accessToken,
         refreshToken,
+        user: ret
     });
 });
 
@@ -91,6 +91,7 @@ router.post("/admin-login", async(req, res) => {
         authenticated: true,
         accessToken,
         refreshToken,
+        user: ret
     });
 });
 
