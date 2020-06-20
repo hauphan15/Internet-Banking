@@ -1,33 +1,28 @@
 const express = require('express');
-const EmployeeModel = require('../../models/Employee.model');
+const EmployeeModel = require('../../models/Employee.Model');
 
 const router = express.Router();
 
 //lấy tất cả nhân viên
-router.get('/', async(req, res) => {
+router.get('/employee-list', async(req, res) => {
     const result = await EmployeeModel.all();
 
-    if (result.length === 0) {
-        return res.send({
-            message: 'Empty'
-        })
-    }
-
+    delete result[0].UserPassword;
     res.send(result);
 })
 
 
 //thêm nhân viên
-router.post('/add', async(req, res) => {
+router.post('/add-employee', async(req, res) => {
     // entity = {
     //     "UserName": "",
-    //     "Password": "",
+    //     "UserPassword": "",
     //     "FullName": "",
     //     "Email": "",
     //     "Phone": "",
     //     "DoB": "",
     // }
-
+    console.log(req.body);
     const retAdd = await EmployeeModel.add(req.body);
 
     res.status(201).json({
@@ -37,7 +32,7 @@ router.post('/add', async(req, res) => {
 
 
 //xóa nhân viên
-router.post('/delete', async(req, res) => {
+router.post('/delete-employee', async(req, res) => {
     // req.body = {
     //     "ID": "",
     // }

@@ -5,15 +5,16 @@ const TransactionModel = require('../../models/Transaction.model');
 const router = express.Router();
 
 //nạp tiền vào tk khách
-router.post('/', async(req, res) => {
+router.post('/addmoney', async(req, res) => {
     // req.body = {
     //     Number: "",
     //     Money: ""
     // }
 
     const takerInfo = await AccNumberModel.singleByNumber(req.body.Number);
-    if (row.length === 0) {
+    if (takerInfo.length === 0) {
         return res.send({
+            success: false,
             message: 'Number not found'
         })
     }
@@ -25,9 +26,9 @@ router.post('/', async(req, res) => {
         AccountBalance: balance
     };
     //update lai so du tai khoan
-    const result = await AccNumModel.updateMoney(takerInfo[0].UserID, newBalance);
+    const result = await AccNumberModel.updateMoney(takerInfo[0].UserID, newBalance);
 
-    if (result[0].changedRows === 0) {
+    if (result.changedRows === 1) {
         return res.send({
             success: true,
             message: 'Successfully update balance'
@@ -44,9 +45,8 @@ router.post('/', async(req, res) => {
 //giao dịch nhân tiền
 router.post('/history/take', async(req, res) => {
     // req.body = {
-    //     "UserID": ""
+    //     "Number": ""
     // }
-
     const history = await TransactionModel.allTakeTrans(req.body.Number);
     res.send(history);
 })
@@ -54,7 +54,7 @@ router.post('/history/take', async(req, res) => {
 //giao dịch chuyển tiền
 router.post('/history/send', async(req, res) => {
     // req.body = {
-    //     "UserID": ""
+    //     "Number": ""
     // }
 
     const history = await TransactionModel.allSendTrans(req.body.Number);
@@ -64,7 +64,7 @@ router.post('/history/send', async(req, res) => {
 //giao dịch về nhắc nợ | trả nợ người khác hoặc người khác trả nợ
 router.post('/history/debt', async(req, res) => {
     // req.body = {
-    //     "UserID": ""
+    //     "Number": ""
     // }
     const history = await TransactionModel.allDebTrans(req.body.Number);
     res.send(history);

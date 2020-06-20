@@ -23,13 +23,13 @@ module.exports = {
     allTakeTrans: number => db.load(
         `SELECT * 
         FROM transactions 
-        WHERE Number_NN = '${number}' AND Type = 'CHUYENKHOANG' 
+        WHERE Number_NN = '${number}' AND Type = 'CHUYENKHOAN' 
         ORDER BY Time DESC`),
 
     allSendTrans: number => db.load(
         `SELECT * 
         FROM transactions 
-        WHERE Number_NG = '${number}' AND Type = 'CHUYENKHOANG' 
+        WHERE Number_NG = '${number}' AND Type = 'CHUYENKHOAN' 
         ORDER BY Time DESC`),
 
     allDebTrans: number => db.load(

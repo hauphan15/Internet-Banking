@@ -5,10 +5,10 @@ const router = express.Router();
 
 
 //thêm admin
-router.post('/add', async(req, res) => {
+router.post('/add-admin', async(req, res) => {
     // entity = {
     //     "UserName": "",
-    //     "Password": "",
+    //     "UserPassword": "",
     //     "FullName": "",
     //     "Email": "",
     //     "Phone": "",

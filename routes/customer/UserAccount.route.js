@@ -6,6 +6,7 @@ const AccNumberModel = require('../../models/AccountNumber.model');
 const TransactionModel = require('../../models/Transaction.model');
 const bcrypt = require('bcryptjs');
 
+
 const router = express.Router();
 
 //Get all user
@@ -16,19 +17,18 @@ router.get('/', async(req, res) => {
     res.json(ret);
 })
 
-//lấy tất cả tài khoản tiết kiệm và tài khoản thanh toán của khách
-router.post('/account/:userid', async(req, res) => {
-
-    const savingAcc = await SavingAccModel.singleByUserId(req.params.userid);
-
-    const spendingAcc = await AccNumberModel.singleById(req.params.userid);
-
-    res.send({
-        SpendingAccount: spendingAcc,
-        SavingAccount: savingAcc
-    })
-
+//lấy tài khoảng thanh toán
+router.post('/account/spending', async(req, res) => {
+    const spendingAcc = await AccNumberModel.singleById(req.body.UserID);
+    res.send(spendingAcc);
 })
+
+//lấy tài khoản tiết kiệm
+router.post('/account/saving', async(req, res) => {
+    const savingAcc = await SavingAccModel.singleByUserId(req.body.UserID);
+    res.send(savingAcc);
+})
+
 
 // THỐNG KÊ GIAO DỊCH
 //giao dịch nhân tiền
@@ -124,7 +124,7 @@ const createOTP = () => {
 
 const OTP = createOTP();
 
-router.post('/misspw', async (req, res) => {
+router.post('/misspw', async(req, res) => {
     // req.body = {
     //     "UserID": ""
     //     "NewPassword":""
@@ -198,7 +198,7 @@ router.post('/info', async function(req, res) {
 
 
 //GỬI MÃ OPT
-router.post('/otp', async(req, res) => {
+router.post('/misspw/otp', async(req, res) => {
 
     const senderInfo = await UserAccModel.singleByNumber(req.body.Number);
 
@@ -219,8 +219,8 @@ router.post('/otp', async(req, res) => {
         to: senderInfo[0].UserEmail,
         subject: 'OTP Verification - HHBank',
         text: `Dear ${senderInfo[0].UserName}
-         This is your OTP code for validating the transaction: ${OTP}
-         This code will expire 2 hours later
+         This is your OTP code for changing password: ${OTP}
+         This code will expire 5 minutes later
         `
     };
     transporter.sendMail(mailOptions, function(error, info) {

@@ -5,6 +5,8 @@ module.exports = {
 
     singleById: id => db.load(`SELECT * FROM takerlist WHERE ID = ${id} `),
 
+    singleByUserId: id => db.load(`SELECT * FROM takerlist WHERE UserID = ${id} `),
+
     singleByNumber: number => db.load(`SELECT * FROM takerlist WHERE Number = '${number}'  `),
 
     add: entity => {
