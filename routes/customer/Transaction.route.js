@@ -40,6 +40,9 @@ router.post('/transaction', async function(req, res) {
     let checkTime = moment().unix() - time; //kiểm tra hiệu lực mã OTP còn hiệu lực ko
 
     const optHeader = req.headers['x-otp-code'];
+    console.log(optHeader);
+    console.log(OTP);
+    console.log(req.body);
 
     if (+optHeader !== +OTP || checkTime > 7200) { // 7200s == 3h
         res.send({
@@ -140,7 +143,10 @@ router.post('/transaction', async function(req, res) {
     await TransModel.add(transInfo);
 
     //response trả về
-    res.send(result);
+    res.send({
+        result,
+        transInfo
+    });
 })
 
 

@@ -20,13 +20,17 @@ router.get('/', async(req, res) => {
 //lấy tài khoảng thanh toán
 router.post('/account/spending', async(req, res) => {
     const spendingAcc = await AccNumberModel.singleById(req.body.UserID);
-    res.send(spendingAcc);
+    delete spendingAcc[0].AccNumID;
+    delete spendingAcc[0].UserID;
+    res.json(spendingAcc);
 })
 
 //lấy tài khoản tiết kiệm
 router.post('/account/saving', async(req, res) => {
     const savingAcc = await SavingAccModel.singleByUserId(req.body.UserID);
-    res.send(savingAcc);
+    delete savingAcc[0].ID;
+    delete savingAcc[0].UserID;
+    res.json(savingAcc);
 })
 
 
@@ -36,8 +40,8 @@ router.post('/history/take', async(req, res) => {
     // req.body = {
     //     "UserID": ""
     // }
-
-    const history = await TransactionModel.allTakeTrans(req.body.Number);
+    const userInfo = await userAccountModel.singleById(req.body.UserID);
+    const history = await TransactionModel.allTakeTrans(userInfo[0].Number);
     res.send(history);
 })
 
@@ -46,8 +50,8 @@ router.post('/history/send', async(req, res) => {
     // req.body = {
     //     "UserID": ""
     // }
-
-    const history = await TransactionModel.allSendTrans(req.body.Number);
+    const userInfo = await userAccountModel.singleById(req.body.UserID);
+    const history = await TransactionModel.allSendTrans(userInfo[0].Number);
     res.send(history);
 })
 
@@ -56,7 +60,8 @@ router.post('/history/debt', async(req, res) => {
     // req.body = {
     //     "UserID": ""
     // }
-    const history = await TransactionModel.allDebTrans(req.body.Number);
+    const userInfo = await userAccountModel.singleById(req.body.UserID);
+    const history = await TransactionModel.allDebTrans(userInfo[0].Number);
     res.send(history);
 })
 
@@ -211,17 +216,20 @@ router.post('/misspw/otp', async(req, res) => {
         }
     });
 
-    console.log(`gmail: ${senderInfo[0].UserEmail}`);
+    console.log(`
+                        gmail: $ { senderInfo[0].UserEmail }
+                        `);
 
     //email người nhận
     const mailOptions = {
         from: 'hhbank.service@gmail.com',
         to: senderInfo[0].UserEmail,
         subject: 'OTP Verification - HHBank',
-        text: `Dear ${senderInfo[0].UserName}
-         This is your OTP code for changing password: ${OTP}
-         This code will expire 5 minutes later
-        `
+        text: `
+                        Dear $ { senderInfo[0].UserName }
+                        This is your OTP code
+                        for changing password: $ { OTP }
+                        This code will expire 5 minutes later `
     };
     transporter.sendMail(mailOptions, function(error, info) {
         if (error) {

@@ -42,7 +42,7 @@ app.use('/employee', require('./routes/employee/CreateCustomerAcc.route'));
 //employee transaction
 app.use('/employee', require('./routes/employee/CustomerTrans.route'));
 
-//customer account
+//customer account | transaction history
 app.use('/customer', require('./routes/customer/UserAccount.route'));
 
 //takerlist
@@ -51,7 +51,8 @@ app.use('/customer/takerlist', require('./routes/customer/TakerList.route'));
 //transaction
 app.use('/customer', require('./routes/customer/Transaction.route'));
 
-app.use('/customer-debtor', verifyToken ,require('./routes/customer/Nhacno.route'));
+//nhắc nợ
+app.use('/customer/reminddebt', require('./routes/customer/RemindDebt.route'));
 
 //giao dịch với ngân hàng đối tác
 app.use('/admin', require('./routes/administrator/PartnerTrans.route'));
