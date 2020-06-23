@@ -12,7 +12,7 @@ const config = require('../../config/default.json');
 
 const router = express.Router();
 
-router.post('/getInfo', async(req, res) => {
+router.post('/get-info', async(req, res) => {
     // req.bodu = {
     //     "Number": ""
     // }
@@ -108,7 +108,7 @@ const createOTP = () => {
 }
 
 const OTP = createOTP();
-router.post('/addMoney', async(req, res) => {
+router.post('/add-money', async(req, res) => {
     // req.body = {
     //     Number_NG: '',
     //     Number_NN: '',
@@ -271,6 +271,8 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
     await PartnerTransModel.add(transInfoPartner);
 
     res.send({
+        success: true,
+        transInfo,
         message: 'Successful Transaction'
     });
 })

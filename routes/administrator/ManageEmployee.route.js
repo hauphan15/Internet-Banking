@@ -43,7 +43,7 @@ router.post('/delete-employee', async(req, res) => {
 })
 
 //update info nhân viên
-router.post('/update', async(req, res) => {
+router.post('/update-employee', async(req, res) => {
     // entity = {
     //     "UserName": "",
     //     "FullName": "",
@@ -64,15 +64,15 @@ router.post('/update', async(req, res) => {
     if (UserName === '') {
         UserName = info[0].UserName;
     }
-    //nếu không update FullName
+    //nếu không update Email
     if (Email === '') {
         Email = info[0].Email;
     }
-    //nếu không update FullName
+    //nếu không update Phone
     if (Phone === '') {
         Phone = info[0].Phone;
     }
-    //nếu không update FullName
+    //nếu không update DoB
     if (DoB === '') {
         DoB = info[0].DoB;
     }
@@ -89,7 +89,7 @@ router.post('/update', async(req, res) => {
         DoB: DoB
     };
 
-    const retUpdate = await EmployeeModel.update(req.body.ID, entity);
+    const retUpdate = await EmployeeModel.updateInfo(req.body.ID, entity);
 
     let result;
     if (retUpdate.changedRows === 1) {

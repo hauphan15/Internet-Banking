@@ -1,6 +1,7 @@
 const express = require('express');
 const UserAccModel = require('../../models/UserAccount.model');
 const AccNumberModel = require('../../models/AccountNumber.model');
+const SavingAccModel = require('../../models/SavingAccount.model');
 const createError = require('http-errors');
 
 
@@ -23,6 +24,7 @@ router.post('/create-acc', async(req, res) => {
     const usrname = await UserAccModel.singleByUserName(req.body.UserName);
     if (usrname.length > 0) {
         res.send({
+            success: false,
             message: 'Username already exists'
         })
         throw createError(401, 'Username already exists');
@@ -54,6 +56,44 @@ router.post('/create-acc', async(req, res) => {
     res.status(201).json({
         UserAcc: result.insertId,
         SpendingAccount: retSpendingAcc.insertId,
+        Number: SpendingAccNumber
+    });
+})
+
+//tạo tk tiết kiệm
+router.post('/create-savingacc', async(req, res) => {
+    // req.body = {
+    //     "UserName": "",
+    // }
+
+    //kiểm tra username
+    const userInfo = await UserAccModel.singleByUserName(req.body.UserName);
+    if (userInfo.length === 0) {
+        res.send({
+            success: false,
+            message: 'Username not found'
+        })
+        throw createError(401, 'Username not found');
+    }
+
+    //random number account
+    let savingAccNumber = '';
+    for (var i = 0; i < 16; i++) {
+        savingAccNumber += Math.floor(Math.random() * (9 - 0) + 0);
+    }
+
+    const account = {
+        UserID: userInfo[0].UserID,
+        Balance: '0',
+        Number: savingAccNumber
+    };
+    const retSavingAcc = await SavingAccModel.add(account);
+
+
+    //response
+    res.status(201).json({
+        SpendingAccount: retSavingAcc.insertId,
+        Number: savingAccNumber
     });
 })
 

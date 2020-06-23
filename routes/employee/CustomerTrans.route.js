@@ -1,11 +1,12 @@
 const express = require('express');
 const AccNumberModel = require('../../models/AccountNumber.model');
 const TransactionModel = require('../../models/Transaction.model');
+const SavingAccModel = require('../../models/SavingAccount.model');
 
 const router = express.Router();
 
 //nạp tiền vào tk khách
-router.post('/addmoney', async(req, res) => {
+router.post('/addmoney-spendingacc', async(req, res) => {
     // req.body = {
     //     Number: "",
     //     Money: ""
@@ -36,10 +37,49 @@ router.post('/addmoney', async(req, res) => {
     } else {
         return res.send({
             success: false,
+            message: 'Failed update balance'
+        })
+    }
+})
+
+
+//nạp tiền vào tài khoản tiết kiệm
+router.post('/addmoney-savingacc', async(req, res) => {
+    // req.body = {
+    //     Number: "",
+    //     Money: ""
+    // }
+
+    const takerInfo = await SavingAccModel.singleByNumber(req.body.Number);
+    if (takerInfo.length === 0) {
+        return res.send({
+            success: false,
+            message: 'Number not found'
+        })
+    }
+
+    //cộng với tiền nạp dô
+    const balance = +takerInfo[0].Balance + (+req.body.Money);
+
+    const newBalance = {
+        Balance: balance
+    };
+    //update lai so du tai khoan
+    const result = await SavingAccModel.updateMoney(takerInfo[0].UserID, newBalance);
+
+    if (result.changedRows === 1) {
+        return res.send({
+            success: true,
+            message: 'Successfully update balance'
+        })
+    } else {
+        return res.send({
+            success: false,
             message: 'Failed update balance '
         })
     }
 })
+
 
 // THỐNG KÊ GIAO DỊCH 1 KHÁCH
 //giao dịch nhân tiền

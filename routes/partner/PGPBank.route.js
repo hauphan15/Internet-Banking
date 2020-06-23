@@ -5,17 +5,18 @@ const crypto = require('crypto');
 const moment = require('moment');
 const PartnerTransModel = require('../../models/PartnerTransaction.model');
 const TransModel = require('../../models/Transaction.model');
+const UserAccModel = require('../../models/UserAccount.model');
+const AccNumModel = require('../../models/AccountNumber.model');
+const nodemailer = require('nodemailer');
 const config = require('../../config/default.json');
 
 
 const router = express.Router();
 
 
-router.get('/getInfo', (req, res) => {
-    var info;
-
+router.post('/get-info', (req, res) => {
     const body = {
-        accountNumber: req.body.accountNumber,
+        accountNumber: req.body.Number,
     };
 
     const username = 'nhom16';
@@ -36,15 +37,20 @@ router.get('/getInfo', (req, res) => {
             })
             .then(function(response) {
                 console.log(response.data);
-                info = response.data;
+                return res.json({
+                    success: true,
+                    data: response.data
+                });
             })
             .catch(function(error) {
                 console.log(error);
+                return res.json({
+                    success: false,
+                    message: error
+                })
             });
     }
     makePostRequest();
-
-    res.send(info);
 })
 
 
@@ -63,7 +69,7 @@ const OTP = createOTP();
 
 
 
-router.get('/addMoney', async(req, res) => {
+router.post('/add-money', async(req, res) => {
     //hhbank key
     const pubkey = `-----BEGIN PGP PUBLIC KEY BLOCK-----
 Version: OpenPGP.js v4.10.4
@@ -249,7 +255,6 @@ bYr+EdyxjzPTPmuiUqwCIMwH2t6tQA==
     //     Type: 'CHUYENKHOAN' 'NHACNO' | chuyển tiền - nhắc nợ
     // };
 
-    var rp;
 
     //Xác thực mã OTP
 
@@ -371,6 +376,7 @@ FxzP2+m6kXwJBnolqhvtIYW1rw==
         const password = 'nhom16';
         const hash = crypto.createHmac('md5', 'webnangcao_hash').update(JSON.stringify(body)).digest('hex');
 
+
         function makePostRequest() {
             axios.post('https://beohoang98-bank-dev.herokuapp.com/api/partner/send', body, {
                     auth: {
@@ -382,22 +388,22 @@ FxzP2+m6kXwJBnolqhvtIYW1rw==
                         'x-partner-time': moment().unix().toString(),
                     }
                 })
-                .then(async function(response) {
+                .then(function(response) {
                     const partnerSig = response.data.signature;
                     const dt = response.data.data;
-                    rp = dt;
-                    const verified = await openpgp.verify({
-                        message: openpgp.cleartext.fromText(JSON.stringify(dt)),
-                        signature: await openpgp.signature.readArmored(partnerSig),
-                        publicKeys: (await openpgp.key.readArmored(partnerPubkey)).keys
-                    });
 
-                    const { valid } = verified.signatures[0];
-                    if (valid) {
-                        console.log('signed by key id ' + verified.signatures[0].keyid.toHex());
-                    } else {
-                        throw new Error('signature could not be verified');
-                    }
+                    // const verified = await openpgp.verify({
+                    //     message: openpgp.cleartext.fromText(JSON.stringify(dt)),
+                    //     signature: await openpgp.signature.readArmored(partnerSig),
+                    //     publicKeys: (await openpgp.key.readArmored(partnerPubkey)).keys
+                    // });
+
+                    // const { valid } = verified.signatures[0];
+                    // if (valid) {
+                    //     console.log('signed by key id ' + verified.signatures[0].keyid.toHex());
+                    // } else {
+                    //     throw new Error('signature could not be verified');
+                    // }
                 })
                 .catch(function(error) {
                     console.log(error);
@@ -437,13 +443,17 @@ FxzP2+m6kXwJBnolqhvtIYW1rw==
     const transInfoPartner = {
         SendBank: 'HHBank',
         TakeBank: 'Nhom16',
-        Money: req.body.amount,
+        Money: req.body.Money,
         Time: moment().format('YYYY-MM-DD hh:mm:ss')
     };
 
     await PartnerTransModel.add(transInfoPartner);
 
-    res.send(rp);
+    res.send({
+        success: true,
+        transInfo,
+        message: 'Successful transaction'
+    });
 })
 
 
