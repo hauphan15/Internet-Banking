@@ -24,6 +24,11 @@ module.exports = {
 
     singleByUserName: username => db.load(`SELECT * FROM useraccounts WHERE UserName = '${username}' `),
 
+    singleByEmailAndUserName: (email, username) => db.load(
+        `SELECT * 
+        FROM useraccounts 
+        WHERE UserEmail = '${email}' AND UserName = '${username}' `),
+
     login: async entity => {
         // entity = {
         //   "UserName": "",

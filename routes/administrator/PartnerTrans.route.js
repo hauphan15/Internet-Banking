@@ -1,15 +1,15 @@
 const express = require('express');
 const PartnerTransModel = require('../../models/PartnerTransaction.model');
+const moment = require('moment');
 
 const router = express.Router();
 
 //lấy tất cả giao dịch với ngân hàng đối tác
 router.get('/partner/all', async(req, res) => {
     const result = await PartnerTransModel.all();
-    if (result.length === 0) {
-        return res.send({
-            message: 'Empty'
-        })
+
+    for (let index = 0; index < result.length; index++) {
+        result[index].Time = moment(result[index].Time).format('DD-MM-YYYY hh:mm');
     }
 
     res.send(result);
@@ -24,6 +24,9 @@ router.post('/partner/by-name', async(req, res) => {
 
     const result = await PartnerTransModel.byPartnerBank(req.body.PartnerBank);
 
+    for (let index = 0; index < result.length; index++) {
+        result[index].Time = moment(result[index].Time).format('DD-MM-YYYY hh:mm');
+    }
 
     res.send(result);
 })
@@ -56,10 +59,9 @@ router.post('/partner/by-time', async(req, res) => {
     };
 
     const result = await PartnerTransModel.byDate(time);
-    if (result.length === 0) {
-        return res.send({
-            message: 'Empty'
-        })
+
+    for (let index = 0; index < result.length; index++) {
+        result[index].Time = moment(result[index].Time).format('DD-MM-YYYY hh:mm');
     }
 
     res.send(result);

@@ -88,6 +88,9 @@ router.post('/history/take', async(req, res) => {
     //     "Number": ""
     // }
     const history = await TransactionModel.allTakeTrans(req.body.Number);
+    for (let index = 0; index < history.length; index++) {
+        history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
+    }
     res.send(history);
 })
 
@@ -98,6 +101,9 @@ router.post('/history/send', async(req, res) => {
     // }
 
     const history = await TransactionModel.allSendTrans(req.body.Number);
+    for (let index = 0; index < history.length; index++) {
+        history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
+    }
     res.send(history);
 })
 
@@ -107,6 +113,9 @@ router.post('/history/debt', async(req, res) => {
     //     "Number": ""
     // }
     const history = await TransactionModel.allDebTrans(req.body.Number);
+    for (let index = 0; index < history.length; index++) {
+        history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
+    }
     res.send(history);
 })
 

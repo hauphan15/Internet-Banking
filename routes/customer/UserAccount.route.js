@@ -5,6 +5,7 @@ const SavingAccModel = require('../../models/SavingAccount.model');
 const AccNumberModel = require('../../models/AccountNumber.model');
 const TransactionModel = require('../../models/Transaction.model');
 const bcrypt = require('bcryptjs');
+const moment = require('moment');
 
 
 const router = express.Router();
@@ -42,6 +43,11 @@ router.post('/history/take', async(req, res) => {
     // }
     const userInfo = await userAccountModel.singleById(req.body.UserID);
     const history = await TransactionModel.allTakeTrans(userInfo[0].Number);
+
+    for (let index = 0; index < history.length; index++) {
+        history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
+    }
+
     res.send(history);
 })
 
@@ -52,6 +58,9 @@ router.post('/history/send', async(req, res) => {
     // }
     const userInfo = await userAccountModel.singleById(req.body.UserID);
     const history = await TransactionModel.allSendTrans(userInfo[0].Number);
+    for (let index = 0; index < history.length; index++) {
+        history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
+    }
     res.send(history);
 })
 
@@ -62,6 +71,9 @@ router.post('/history/debt', async(req, res) => {
     // }
     const userInfo = await userAccountModel.singleById(req.body.UserID);
     const history = await TransactionModel.allDebTrans(userInfo[0].Number);
+    for (let index = 0; index < history.length; index++) {
+        history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
+    }
     res.send(history);
 })
 
@@ -72,28 +84,18 @@ router.post('/changepw', async(req, res) => {
     //     "UserID": ""
     //     "OldPassword":""
     //     "NewPassword":""
-    //     "ConfirmPassword":""
     // }
 
     const rows = await userAccountModel.singleById(req.body.UserID);
-    if (rows.length === 0) {
-        return res.send({
-            message: 'UserID not found'
-        })
-    }
 
     const hashPwd = rows[0].UserPassword;
-    if (!bcrypt.compareSync(entity.OldPassword, hashPwd)) {
+    if (!bcrypt.compareSync(req.body.OldPassword, hashPwd)) {
         return res.send({
+            success: false,
             message: 'Old password is incorrect'
         })
     }
 
-    if (req.body.NewPassword !== req.body.ConfirmPassword) {
-        return res.send({
-            message: 'New password and confirm password does not match'
-        })
-    }
 
     const updateObj = {
         UserID: req.body.UserID,
@@ -101,77 +103,10 @@ router.post('/changepw', async(req, res) => {
     }
     const result = await userAccountModel.updatePassword(updateObj);
 
-    if (result[0].changedRows === 0) {
+    if (result.changedRows === 1) {
         return res.send({
             success: true,
             message: 'Your password has been successfully updated'
-        })
-    } else {
-        return res.send({
-            success: false,
-            message: 'Failed update password '
-        })
-    }
-})
-
-
-//quên mật khẩu
-
-let time;
-
-const createOTP = () => {
-    let OTPcode = '';
-    for (var i = 0; i < 6; i++) {
-        OTPcode += Math.floor(Math.random() * (9 - 0) + 0);
-    }
-    return OTPcode;
-}
-
-const OTP = createOTP();
-
-router.post('/misspw', async(req, res) => {
-    // req.body = {
-    //     "UserID": ""
-    //     "NewPassword":""
-    //     "ConfirmPassword":""
-    // }
-
-    //Xác thực mã OTP
-
-    let checkTime = moment().unix() - time; //kiểm tra hiệu lực mã OTP còn hiệu lực ko
-
-    const optHeader = req.headers['x-otp-code'];
-
-    if (+optHeader !== +OTP || checkTime > 3000) { // 3000s == 5m
-        res.send({
-            message: 'Invalid OTP code or expired OPT code'
-        })
-        throw createError(401, 'Invalid OTP code or expired OPT code');
-    }
-
-    const rows = await userAccountModel.singleById(req.body.UserID);
-    if (rows.length === 0) {
-        return res.send({
-            message: 'UserID not found'
-        })
-    }
-
-    if (req.body.NewPassword !== req.body.ConfirmPassword) {
-        return res.send({
-            message: 'New password and confirm password does not match'
-        })
-    }
-
-    const updateObj = {
-        UserID: req.body.UserID,
-        NewPassword: req.body.NewPassword
-    }
-    const result = await userAccountModel.updatePassword(updateObj);
-
-    if (result[0].changedRows === 0) {
-        return res.send({
-            success: true,
-            message: 'Password has been successfully updated'
         })
     } else {
         return res.send({
@@ -199,57 +134,5 @@ router.post('/info', async function(req, res) {
         data: name[0].FullName
     });
 })
-
-
-
-//GỬI MÃ OPT
-router.post('/misspw/otp', async(req, res) => {
-
-    const senderInfo = await UserAccModel.singleByNumber(req.body.Number);
-
-    //email người gửi
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'hhbank.service@gmail.com',
-            pass: 'hhbank123456'
-        }
-    });
-
-    console.log(`
-                        gmail: $ { senderInfo[0].UserEmail }
-                        `);
-
-    //email người nhận
-    const mailOptions = {
-        from: 'hhbank.service@gmail.com',
-        to: senderInfo[0].UserEmail,
-        subject: 'OTP Verification - HHBank',
-        text: `
-                        Dear $ { senderInfo[0].UserName }
-                        This is your OTP code
-                        for changing password: $ { OTP }
-                        This code will expire 5 minutes later `
-    };
-    transporter.sendMail(mailOptions, function(error, info) {
-        if (error) {
-            console.log(error);
-            res.send({
-                success: false,
-                message: error,
-            })
-            throw createError(401, 'Can not send email');
-        }
-        console.log('Email sent: ' + info.response);
-        time = moment().unix();
-    });
-
-    res.send({
-        success: true,
-        OTP
-    });
-})
-
-
 
 module.exports = router;

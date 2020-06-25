@@ -1,5 +1,7 @@
 const express = require('express');
 const EmployeeModel = require('../../models/Employee.Model');
+const moment = require('moment');
+
 
 const router = express.Router();
 
@@ -7,7 +9,11 @@ const router = express.Router();
 router.get('/employee-list', async(req, res) => {
     const result = await EmployeeModel.all();
 
-    delete result[0].UserPassword;
+    for (let index = 0; index < result.length; index++) {
+        result[index].DoB = moment(result[index].DoB).format('DD-MM-YYYY');
+        delete result[index].UserPassword;
+    }
+
     res.send(result);
 })
 

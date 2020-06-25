@@ -106,20 +106,22 @@ router.post("/user-refresh", async(req, res) => {
         req.body.accessToken,
         config.token.secret, { ignoreExpiration: true },
         async function(err, payload) {
-            const userId = req.body.id;
+            const { userId } = payload;
             const ret = await userAccountModel.verifyRefreshToken(
                 userId,
                 req.body.refreshToken
             );
             if (ret === false) {
                 return res.json({
-                    result: false
+                    success: false
                 });
-                //throw createError(400, "Invalid refresh token.");
             }
 
             const accessToken = generateAccessToken(userId);
-            res.json({ accessToken, result: true });
+            res.json({
+                success: true,
+                accessToken
+            });
         }
     );
 });
@@ -176,8 +178,8 @@ router.post("/admin-refresh", async(req, res) => {
     );
 });
 
-const generateAccessToken = (employeeId) => {
-    const payload = { employeeId };
+const generateAccessToken = (id) => {
+    const payload = { id };
     const accessToken = jwt.sign(payload, config.token.secret, {
         expiresIn: config.token.expiresIn,
     });
