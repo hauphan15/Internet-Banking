@@ -266,6 +266,7 @@ bYr+EdyxjzPTPmuiUqwCIMwH2t6tQA==
 
     if (+optHeader !== +OTP || checkTime > 7200) { // 7200s == 3h
         res.send({
+            success: false,
             message: 'Invalid OTP code or expired OPT code'
         })
         throw createError(401, 'Invalid OTP code or expired OPT code');
@@ -280,7 +281,7 @@ bYr+EdyxjzPTPmuiUqwCIMwH2t6tQA==
                 success: false,
                 message: 'Balance is not enough for the transaction'
             }
-            res.send(result);
+            res.send(result.success);
             throw createError(401, 'Balance is not enough for the transaction');
         }
     } else {
@@ -289,7 +290,7 @@ bYr+EdyxjzPTPmuiUqwCIMwH2t6tQA==
                 success: false,
                 message: 'Balance is not enough for the transaction'
             }
-            res.send(result);
+            res.send(result.success);
             throw createError(401, 'Balance is not enough for the transaction');
         }
     }

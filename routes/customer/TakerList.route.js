@@ -12,6 +12,10 @@ router.post('/', async(req, res) => {
 
     const result = await TakerListModel.singleByUserId(req.body.UserID);
 
+    for (let index = 0; index < result.length; index++) {
+        delete result[index].UserID;
+    }
+
     res.send(result);
 })
 

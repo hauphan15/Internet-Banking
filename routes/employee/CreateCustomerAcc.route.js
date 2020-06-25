@@ -54,6 +54,7 @@ router.post('/create-acc', async(req, res) => {
 
     //response
     res.status(201).json({
+        success: true,
         UserAcc: result.insertId,
         SpendingAccount: retSpendingAcc.insertId,
         Number: SpendingAccNumber
@@ -69,11 +70,10 @@ router.post('/create-savingacc', async(req, res) => {
     //kiểm tra username
     const userInfo = await UserAccModel.singleByUserName(req.body.UserName);
     if (userInfo.length === 0) {
-        res.send({
+        return res.send({
             success: false,
             message: 'Username not found'
         })
-        throw createError(401, 'Username not found');
     }
 
     //random number account
@@ -89,9 +89,9 @@ router.post('/create-savingacc', async(req, res) => {
     };
     const retSavingAcc = await SavingAccModel.add(account);
 
-
     //response
     res.status(201).json({
+        success: true,
         SpendingAccount: retSavingAcc.insertId,
         Number: savingAccNumber
     });

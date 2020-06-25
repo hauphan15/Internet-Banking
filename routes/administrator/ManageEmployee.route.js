@@ -28,10 +28,10 @@ router.post('/add-employee', async(req, res) => {
     //     "Phone": "",
     //     "DoB": "",
     // }
-    console.log(req.body);
     const retAdd = await EmployeeModel.add(req.body);
 
     res.status(201).json({
+        success: true,
         ID: retAdd.insertId,
     });
 })
@@ -45,7 +45,10 @@ router.post('/delete-employee', async(req, res) => {
 
     const ret = await EmployeeModel.delete(req.body.ID);
 
-    res.send(ret);
+    res.send({
+        success: true,
+        ret
+    });
 })
 
 //update info nhân viên

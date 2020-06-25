@@ -129,7 +129,8 @@ router.post('/add-money', async(req, res) => {
 
     if (+optHeader !== +OTP || checkTime > 7200) { // 7200s == 3h
         res.send({
-            message: 'Invalid OTP code or expired OPT code'
+            message: 'Invalid OTP code or expired OPT code',
+            success: false
         })
         throw createError(401, 'Invalid OTP code or expired OPT code');
     }
@@ -144,7 +145,7 @@ router.post('/add-money', async(req, res) => {
                 success: false,
                 message: 'Balance is not enough for the transaction'
             }
-            res.send(result);
+            res.send(result.success);
             throw createError(401, 'Balance is not enough for the transaction');
         }
     } else {
@@ -153,7 +154,7 @@ router.post('/add-money', async(req, res) => {
                 success: false,
                 message: 'Balance is not enough for the transaction'
             }
-            res.send(result);
+            res.send(result.success);
             throw createError(401, 'Balance is not enough for the transaction');
         }
     }

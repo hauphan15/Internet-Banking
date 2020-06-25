@@ -2,10 +2,11 @@ const express = require('express');
 const AccNumberModel = require('../../models/AccountNumber.model');
 const TransactionModel = require('../../models/Transaction.model');
 const SavingAccModel = require('../../models/SavingAccount.model');
+const moment = require('moment');
 
 const router = express.Router();
 
-//nạp tiền vào tk khách
+//nạp tiền vào tk thanh toán
 router.post('/addmoney-spendingacc', async(req, res) => {
     // req.body = {
     //     Number: "",

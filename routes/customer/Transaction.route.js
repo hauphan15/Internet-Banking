@@ -46,6 +46,7 @@ router.post('/transaction', async function(req, res) {
 
     if (+optHeader !== +OTP || checkTime > 7200) { // 7200s == 3h
         res.send({
+            success: false,
             message: 'Invalid OTP code or expired OPT code'
         })
         throw createError(401, 'Invalid OTP code or expired OPT code');
@@ -144,7 +145,7 @@ router.post('/transaction', async function(req, res) {
 
     //response trả về
     res.send({
-        result,
+        success: result.success,
         transInfo
     });
 })
