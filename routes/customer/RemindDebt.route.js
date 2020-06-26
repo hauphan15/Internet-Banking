@@ -4,6 +4,10 @@ const DebtorModel = require("../../models/Debtor.model");
 
 const router = express.Router();
 
+router.get("/", (req, res) => {
+    res.json("hello");
+})
+
 router.post("/create", async function(req, res) {
     // req.body = {
     //     "CreatorID ": "",
@@ -20,13 +24,11 @@ router.post("/create", async function(req, res) {
     console.log(debtorInfo);
 
     const entity = {
-        CreatorID: req.body.CreatorID,
-        CreditorID: req.body.CreditorID,
-        DebtorID: debtorInfo[0].UserID,
-        Money: req.body.Money,
-        Content: req.body.Content,
-        DeletedContent: "no",
-        Status: "no",
+        creatorID: req.body.CreatorID,
+        debtorID: debtorInfo[0].UserID,
+        content: req.body.Content,
+        money: req.body.Money,
+        status: 1
     };
     const result = await DebtorModel.Add(entity);
 

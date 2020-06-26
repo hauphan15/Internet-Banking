@@ -101,14 +101,12 @@ router.post("/user-refresh", async(req, res) => {
     //   accessToken,
     //   refreshToken
     // }
-
     jwt.verify(
         req.body.accessToken,
         config.token.secret, { ignoreExpiration: true },
         async function(err, payload) {
-            const { userId } = payload;
             const ret = await userAccountModel.verifyRefreshToken(
-                userId,
+                req.body.id,
                 req.body.refreshToken
             );
             if (ret === false) {
@@ -117,7 +115,7 @@ router.post("/user-refresh", async(req, res) => {
                 });
             }
 
-            const accessToken = generateAccessToken(userId);
+            const accessToken = generateAccessToken(req.body.id);
             res.json({
                 success: true,
                 accessToken

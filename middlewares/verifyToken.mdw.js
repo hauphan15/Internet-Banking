@@ -11,7 +11,7 @@ module.exports = function(req, res, next) {
         jwt.verify(token, config.token.secret, function(err, payload) {
             if (err) {
                 res.send({
-                    successToken: false,
+                    success: false,
                     message: err
                 });
                 throw createError(401, err);
