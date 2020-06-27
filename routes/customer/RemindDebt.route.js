@@ -12,7 +12,8 @@ router.post("/create", async function(req, res) {
     // req.body = {
     //     "CreatorID ": "",
     //     "DebtorNumber": "",
-    //     "Content": ""
+    //     "Money": ""
+    //     "Content": "",
     // }
 
     const debtorInfo = await UserAccModel.singleByNumber(req.body.DebtorNumber);
@@ -31,15 +32,17 @@ router.post("/create", async function(req, res) {
         status: 1
     };
     const result = await DebtorModel.Add(entity);
-
-    res.json({
+    const object = {
+        ID: result.insertId,
         CreatorID: req.body.CreatorID,
-        CreditorID: req.body.CreditorID,
         DebtorNumber: req.body.DebtorNumber,
+        DebotrName: debtorInfo[0].Fullname,
         Money: req.body.Money,
-        Content: req.body.Content,
-        DeletedContent: "no",
-        Status: "no",
+        Content: req.body.Content
+    };
+    res.json({
+        success: true,
+        object
     });
 });
 

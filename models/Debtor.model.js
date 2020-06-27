@@ -4,27 +4,24 @@ const bcrypt = require("bcryptjs");
 module.exports = {
     getDebtor: (UserID) =>
         db.load(
-            `SELECT * FROM debtorlist WHERE DeletedContent = 'no' AND Status = 'no' AND CreditorID = ${UserID}`
-        ),
+            `SELECT * 
+            FROM debtorlist 
+            WHERE Status = 1 AND creatorID = ${UserID}`),
 
     getCreditor: (UserID) =>
-        db.load(`SELECT * FROM debtorlist WHERE DeletedContent = 'no' AND Status = 'no' AND DebtorID = ${UserID}`),
+        db.load(
+            `SELECT * 
+            FROM debtorlist 
+            WHERE Status = 1 AND DebtorID = ${UserID}`),
 
     Add: (entity) => {
         // {
         //     CreatorID: ,
-        //     CreditorID: ,
         //     DebtorID: ,
         //     Money: "",
         //     Content: "",
-        //     DeleteContent: "no",
-        //     Status: "no"
+        //     Status: "1"
         // }
         return db.add("debtorlist", entity);
     },
-
-    DebtList: userid => db.load(
-        `SELECT * 
-        FROM (SELECT * FROM debtorlist WHERE DeletedContent = 'no' AND Status = 'no') as list
-        WHERE list.CreditorID = ${userid} OR list.DebtorID = ${userid}`)
 };
