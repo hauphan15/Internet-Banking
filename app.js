@@ -42,7 +42,7 @@ app.use('/login', require('./routes/login/Login.route'));
 
 //--------------------CHANGE PASSWORD------------------------
 //change password
-app.use('/misspw', require('./routes/login/ForgetPassword.route'));
+app.use('/misspw', verifyToken, require('./routes/login/ForgetPassword.route'));
 
 
 //-----------------------EMPLOYEE------------------------
@@ -66,16 +66,16 @@ app.use('/customer', verifyToken, require('./routes/customer/Transaction.route')
 //nhắc nợ
 app.use('/customer/reminddebt', verifyToken, require('./routes/customer/RemindDebt.route'));
 
-// app.use('/customer', require('./routes/customer/UserAccount.route'));
+app.use('/customer', verifyToken, require('./routes/customer/UserAccount.route'));
 
-// //takerlist
-// app.use('/customer/takerlist', require('./routes/customer/TakerList.route'));
+//takerlist
+app.use('/customer/takerlist', verifyToken, require('./routes/customer/TakerList.route'));
 
-// //transaction
-// app.use('/customer', require('./routes/customer/Transaction.route'));
+//transaction
+app.use('/customer', verifyToken, require('./routes/customer/Transaction.route'));
 
-// //nhắc nợ
-// app.use('/customer/reminddebt', require('./routes/customer/RemindDebt.route'));
+//nhắc nợ
+app.use('/customer/reminddebt', verifyToken, require('./routes/customer/RemindDebt.route'));
 
 //---------------------ADMIN--------------------------
 //giao dịch với ngân hàng đối tác
