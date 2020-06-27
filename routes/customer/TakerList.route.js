@@ -51,16 +51,19 @@ router.post('/add', async(req, res) => {
 
     const retAdd = await TakerListModel.add(taker);
     const takerName = await TakerListModel.singleById(retAdd.insertId);
-    res.status(201).json({
+    const object = {
         ID: retAdd.insertId,
-        UserID: req.body.UserID,
         Number: req.body.Number,
         Name: takerName[0].Name
+    };
+    res.status(201).json({
+        success: true,
+        object
     });
 })
 
 
-//xóa người nhân
+//xóa người nhận
 router.post('/delete', async(req, res) => {
     // req.body = {
     //     "ID": "",
@@ -68,52 +71,44 @@ router.post('/delete', async(req, res) => {
 
     const ret = await TakerListModel.delete(req.body.ID);
 
-    res.send(ret);
+    res.send({
+        ret,
+        success: true
+    });
 })
 
 //update stk và tên gợi nhớ người nhận
 router.post('/update', async(req, res) => {
     // req.body = {
     //     "ID": ""
-    //     "Number": "",
     //     "Name": ""
     // }
 
     const info = await TakerListModel.singleById(req.body.ID);
-
-    let number = req.body.Number;
-    let name = req.body.Name;
-
-    //nếu ko update number
-    if (number === '') {
-        number = info[0].Number;
-    }
-    //nếu không update name
-    if (name === '') {
-        name = info[0].Name;
+    if (info.length === 0) {
+        return res.send({
+            success: false
+        })
     }
 
     const entity = {
-        Number: number,
-        Name: name
+        Number: info[0].Number,
+        Name: req.body.Name
     };
 
     const retUpdate = await TakerListModel.update(req.body.ID, entity);
 
-    let result;
     if (retUpdate.changedRows === 1) {
-        result = {
+        res.send({
             success: true,
             message: 'successful Update'
-        }
+        });
     } else {
-        result = {
+        res.send({
             success: false,
             message: 'Failed Update'
-        }
+        });
     }
-
-    res.send(result);
 })
 
 module.exports = router;
