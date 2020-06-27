@@ -11,7 +11,7 @@ module.exports = function(req, res, next) {
         jwt.verify(token, config.token.secret, function(err, payload) {
             if (err) {
                 res.send({
-                    success: false,
+                    Tokensuccess: false,
                     message: err
                 });
                 throw createError(401, err);
@@ -21,7 +21,7 @@ module.exports = function(req, res, next) {
         })
     } else {
         res.send({
-            success: false,
+            Tokensuccess: false,
             message: 'No access token found.'
         });
         throw createError(401, 'No accessToken found.');
