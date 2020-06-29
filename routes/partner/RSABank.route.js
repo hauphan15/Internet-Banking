@@ -10,6 +10,7 @@ const UserAccModel = require('../../models/UserAccount.model');
 const nodemailer = require('nodemailer');
 const config = require('../../config/default.json');
 const TakerListModel = require('../../models/TakerList.model');
+const UserOTPModel = require('../../models/UserOTP.model');
 
 const router = express.Router();
 
@@ -123,20 +124,6 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
     makePostRequest();
 })
 
-
-
-
-let time;
-
-const createOTP = () => {
-    let OTPcode = '';
-    for (var i = 0; i < 6; i++) {
-        OTPcode += Math.floor(Math.random() * (9 - 0) + 0);
-    }
-    return OTPcode;
-}
-
-const OTP = createOTP();
 router.post('/add-money', async(req, res) => {
     // req.body = {
     //     Number_NG: '',
@@ -147,44 +134,38 @@ router.post('/add-money', async(req, res) => {
     //     Type: 'CHUYENKHOAN' 'NHACNO' | chuyển tiền - nhắc nợ
     // };
 
-    let rp;
+    const senderInfo = await AccNumModel.singleByNumber(req.body.Number_NG);
 
     //Xác thực mã OTP
-    let checkTime = moment().unix() - time; //kiểm tra hiệu lực mã OTP còn hiệu lực ko
+    //lấy code lưu trong db ra để ss với code customer nhập vào
+    const UserOTP = await UserOTPModel.singleByUserId(senderInfo[0].UserID)
 
-    console.log(req.headers['x-otp-code']);
+    let checkTime = moment().unix() - UserOTP[0].Time; //kiểm tra hiệu lực mã OTP còn hiệu lực ko
 
     const optHeader = req.headers['x-otp-code'];
 
-    if (+optHeader !== +OTP || checkTime > 7200) { // 7200s == 3h
-        res.send({
-            message: 'Invalid OTP code or expired OPT code',
-            success: false
+    if (+optHeader !== +UserOTP[0].Code || checkTime > 7200) { // 7200s == 3h
+        return res.send({
+            success: false,
+            message: 'Invalid OTP code or expired OPT code'
         })
-        throw createError(401, 'Invalid OTP code or expired OPT code');
     }
-
-    const senderInfo = await AccNumModel.singleByNumber(req.body.Number_NG);
 
 
     //ktra số dư người gửi
     if (req.body.Fee === 'NG') {
         if (+senderInfo[0].AccountBalance < (+req.body.Money + +config.transaction.ExternalBank)) { //số dư có bé hơn tiền gửi + phí hay k
-            result = { //TH ng gửi trả phí
+            return res.send({ //TH ng gửi trả phí
                 success: false,
                 message: 'Balance is not enough for the transaction'
-            }
-            res.send(result.success);
-            throw createError(401, 'Balance is not enough for the transaction');
+            })
         }
     } else {
         if (+senderInfo[0].AccountBalance < +req.body.Money) { //số dư có bé tiền gửi,TH gửi nhận trả phí
-            result = {
+            return res.send({ //TH ng gửi trả phí
                 success: false,
                 message: 'Balance is not enough for the transaction'
-            }
-            res.send(result.success);
-            throw createError(401, 'Balance is not enough for the transaction');
+            })
         }
     }
 
@@ -311,13 +292,11 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
 
 //GỬI MÃ OPT
 router.post('/otp', async(req, res) => {
-    // req.body = {
-    //     Number: ""
-    // }
 
+    const OTP = createOTP();
     const senderInfo = await UserAccModel.singleByNumber(req.body.Number);
 
-    //email người gửi
+    //email ngân hàng gửi mã OTP
     const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -351,11 +330,27 @@ router.post('/otp', async(req, res) => {
         time = moment().unix();
     });
 
+    const entity = {
+        UserID: senderInfo[0].UserID,
+        Code: OTP,
+        Time: moment().unix()
+    };
+    await UserOTPModel.updateOTP(entity);
+
     res.send({
         success: true,
-        OTP
-    })
+        OTP: OTP
+    });
 })
+
+
+const createOTP = () => {
+    let OTPcode = '';
+    for (var i = 0; i < 6; i++) {
+        OTPcode += Math.floor(Math.random() * (9 - 0) + 0);
+    }
+    return OTPcode;
+}
 
 
 
