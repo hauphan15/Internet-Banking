@@ -47,6 +47,9 @@ router.post('/history/take', async(req, res) => {
     for (let index = 0; index < history.length; index++) {
         history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
     }
+    delete history[0].ID;
+    delete history[0].Type;
+    delete history[0].Fee;
 
     res.send(history);
 })
@@ -61,6 +64,10 @@ router.post('/history/send', async(req, res) => {
     for (let index = 0; index < history.length; index++) {
         history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
     }
+    delete history[0].ID;
+    delete history[0].Type;
+    delete history[0].Fee;
+
     res.send(history);
 })
 
@@ -74,6 +81,11 @@ router.post('/history/debt', async(req, res) => {
     for (let index = 0; index < history.length; index++) {
         history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
     }
+
+    delete history[0].ID;
+    delete history[0].Type;
+    delete history[0].Fee;
+
     res.send(history);
 })
 
