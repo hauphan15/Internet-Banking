@@ -27,13 +27,14 @@ router.post('/add', async(req, res) => {
     //     "Number": "",
     //     "Name": ""
     // };
+
     const info = await UserAccModel.singleByNumber(req.body.Number);
 
     //kiểm tra tài khoản người nhận có hợp lệ
     if (info.length === 0) {
         return res.send({
             success: false,
-            message: 'Invalid TakerNumber'
+            message: 'Số tài khoản không hợp lệ'
         })
     }
 
