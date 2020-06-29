@@ -19,6 +19,10 @@ module.exports = {
         // }
         return db.add("debtorlist", entity);
     },
+    Delete: (entity) => {
+        db.load(`UPDATE debtorlist SET status = 0 WHERE creatorID = ${entity.CreatorID} AND debtorID = ${entity.DebtorID} 
+        AND content = '${entity.Content}' AND money = '${entity.Money}'`)
+    },
 
     DebtList: userid => db.load(
         `SELECT * 

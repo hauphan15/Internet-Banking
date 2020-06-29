@@ -1,6 +1,7 @@
 const express = require("express");
 const UserAccModel = require("../../models/UserAccount.model");
 const DebtorModel = require("../../models/Debtor.model");
+const nodemailer = require('nodemailer');
 
 const router = express.Router();
 
@@ -36,6 +37,36 @@ router.post("/create", async function(req, res) {
     });
 });
 
+router.post('/delete', async(req, res) => {
+    const user = await UserAccModel.singleByNumber(req.body.Number);
+    if(user === null) {
+        return res.json({success: false});
+    }
+
+
+    if(req.body.isdebtor) {
+        const entity = {
+            CreatorID: user[0].UserID,
+            Debtor: req.body.UserID,
+            Content: req.body.Content,
+            Money: req.body.Money
+        }
+        await DebtorModel.Delete(entity);
+    }
+    else {
+        const entity = {
+            CreatorID: req.body.UserID,
+            DebtorID: user[0].UserID,
+            Content: req.body.Content,
+            Money: req.body.Money
+        }
+        console.log(entity);
+        await DebtorModel.Delete(entity);
+    }
+
+    res.json({success: true})
+})
+
 router.post('/debtorlist', async(req, res) => {
     const rows = await DebtorModel.getDebtor(req.body.UserID);
     if(rows === null) {
@@ -49,7 +80,8 @@ router.post('/debtorlist', async(req, res) => {
         var item = {
             FullName: user[0].FullName,
             Number: user[0].Number,
-            Money: rows[i].money
+            Money: rows[i].money,
+            Content: rows[i].content
         }
         items.push(item);
     }
@@ -72,13 +104,58 @@ router.post('/creatorlist', async(req, res) => {
         var item = {
             FullName: user[0].FullName,
             Number: user[0].Number,
-            Money: rows[i].money
+            Money: rows[i].money,
+            Content: rows[i].content
         }
         items.push(item);
     }
     res.json({
         success: true,
         list: items
+    });
+})
+
+router.post('/notify', async(req, res) => {
+
+    const senderInfo = await UserAccModel.singleByNumber(req.body.Number);
+    const user = await UserAccModel.singleById(req.body.UserID);
+
+    //email người gửi
+    const transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'hhbank.service@gmail.com',
+            pass: 'hhbank123456'
+        }
+    });
+
+    //email người nhận
+    const mailOptions = {
+        from: 'hhbank.service@gmail.com',
+        to: senderInfo[0].UserEmail,
+        subject: 'Notice:',
+        text: 
+        `Dear ${senderInfo[0].FullName}
+        your debt: ${req.body.Content} - ${req.body.Money} is delete by ${user[0].FullName} 
+
+        HHBANK!
+        `
+    };
+    transporter.sendMail(mailOptions, function(error, info) {
+        if (error) {
+            console.log(error);
+            res.send({
+                success: false,
+                message: error,
+            })
+            throw createError(401, 'Can not send email');
+        }
+        console.log('Email sent: ' + info.response);
+        time = moment().unix();
+    });
+
+    res.send({
+        success: true,
     });
 })
 
