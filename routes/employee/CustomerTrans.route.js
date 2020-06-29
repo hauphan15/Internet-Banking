@@ -89,6 +89,14 @@ router.post('/history/take', async(req, res) => {
     //     "Number": ""
     // }
     const history = await TransactionModel.allTakeTrans(req.body.Number);
+
+    if (history.length === 0) {
+        return res.send({
+            success: false,
+            message: 'Số tài khoản không tìm thấy'
+        })
+    }
+
     for (let index = 0; index < history.length; index++) {
         history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
     }
@@ -100,8 +108,13 @@ router.post('/history/send', async(req, res) => {
     // req.body = {
     //     "Number": ""
     // }
-
     const history = await TransactionModel.allSendTrans(req.body.Number);
+    if (history.length === 0) {
+        return res.send({
+            success: false,
+            message: 'Số tài khoản không tìm thấy'
+        })
+    }
     for (let index = 0; index < history.length; index++) {
         history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
     }
@@ -114,6 +127,12 @@ router.post('/history/debt', async(req, res) => {
     //     "Number": ""
     // }
     const history = await TransactionModel.allDebTrans(req.body.Number);
+    if (history.length === 0) {
+        return res.send({
+            success: false,
+            message: 'Số tài khoản không tìm thấy'
+        })
+    }
     for (let index = 0; index < history.length; index++) {
         history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
     }

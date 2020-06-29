@@ -23,11 +23,10 @@ router.post('/create-acc', async(req, res) => {
     //kiểm tra username
     const usrname = await UserAccModel.singleByUserName(req.body.UserName);
     if (usrname.length > 0) {
-        res.send({
+        return res.send({
             success: false,
             message: 'Username already exists'
         })
-        throw createError(401, 'Username already exists');
     }
 
     //random number account

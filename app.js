@@ -40,9 +40,9 @@ app.use('/partner-rsa', verifyToken, require('./routes/partner/RSABank.route'));
 app.use('/login', require('./routes/login/Login.route'));
 
 
-//--------------------CHANGE PASSWORD------------------------
-//change password
-app.use('/misspw', verifyToken, require('./routes/login/ForgetPassword.route'));
+//--------------------MISS PASSWORD------------------------
+//miss password
+app.use('/misspw', require('./routes/login/ForgetPassword.route'));
 
 
 //-----------------------EMPLOYEE------------------------

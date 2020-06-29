@@ -28,6 +28,16 @@ router.post('/add-employee', async(req, res) => {
     //     "Phone": "",
     //     "DoB": "",
     // }
+
+    //kiểm tra username
+    const usrname = await EmployeeModel.singleByUserName(req.body.UserName);
+    if (usrname.length > 0) {
+        return res.send({
+            success: false,
+            message: 'Username already exists'
+        })
+    }
+
     const retAdd = await EmployeeModel.add(req.body);
 
     res.status(201).json({
