@@ -371,7 +371,7 @@ FxzP2+m6kXwJBnolqhvtIYW1rw==
                 .then(function(response) {
                     const partnerSig = response.data.signature;
                     const dt = response.data.data;
-
+                    console.log(dt);
                     // const verified = await openpgp.verify({
                     //     message: openpgp.cleartext.fromText(JSON.stringify(dt)),
                     //     signature: await openpgp.signature.readArmored(partnerSig),
@@ -439,7 +439,9 @@ FxzP2+m6kXwJBnolqhvtIYW1rw==
 
 //GỬI MÃ OPT
 router.post('/otp', async(req, res) => {
-
+    // req.body = {
+    //     Number: "",
+    // }
     const OTP = createOTP();
     const senderInfo = await UserAccModel.singleByNumber(req.body.Number);
 

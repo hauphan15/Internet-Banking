@@ -135,7 +135,7 @@ router.post("/employee-refresh", async(req, res) => {
         req.body.accessToken,
         config.auth.secret, { ignoreExpiration: true },
         async function(err, payload) {
-            const { employeeId } = payload;
+            const employeeId = req.body.id;
             const ret = await EmployeeModel.verifyRefreshToken(
                 employeeId,
                 req.body.refreshToken
@@ -145,7 +145,10 @@ router.post("/employee-refresh", async(req, res) => {
             }
 
             const accessToken = generateAccessToken(employeeId);
-            res.json({ accessToken });
+            res.json({
+                success: true,
+                accessToken
+            });
         }
     );
 });
@@ -161,7 +164,7 @@ router.post("/admin-refresh", async(req, res) => {
         req.body.accessToken,
         config.auth.secret, { ignoreExpiration: true },
         async function(err, payload) {
-            const { adminId } = payload;
+            const adminId = req.body.id;
             const ret = await AdminModel.verifyRefreshToken(
                 adminId,
                 req.body.refreshToken
@@ -171,7 +174,10 @@ router.post("/admin-refresh", async(req, res) => {
             }
 
             const accessToken = generateAccessToken(adminId);
-            res.json({ accessToken });
+            res.json({
+                success: true,
+                accessToken
+            });
         }
     );
 });

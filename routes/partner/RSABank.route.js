@@ -109,7 +109,7 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
                 } else {
                     return res.send({
                         success: false,
-                        message: 'Number not found'
+                        message: 'Số tài khoản không hợp lệ'
                     })
                 }
             })
@@ -220,7 +220,7 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
     //partner-sig
     const sign_transfer_hhbank = md5(ts.toString() + JSON.stringify(content_transfer_hhbank) + 'sacombank-linking-code');
 
-    function makePostRequest() {
+    async function makePostRequest() {
         axios.post('https://sacombank-internet-banking.herokuapp.com/services/accounts/transfer', {
                 message: content_transfer_hhbank.message,
                 signature: content_transfer_hhbank.signature
@@ -231,14 +231,62 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
                     'x-timestamp': ts
                 }
             })
-            .then(function(response) {
-                dt = response.data;
+            .then(async function(response) {
+                const dt = response.data;
                 const decryptedMessage = Private_Key.decrypt(dt.messageResponse, 'utf8');
                 console.log(JSON.parse(decryptedMessage));
-                re = decryptedMessage;
+                const RSAResponse = JSON.parse(decryptedMessage);
 
                 const isValid = key.verify(JSON.parse(decryptedMessage), dt.signatureResponse, 'utf8', 'base64');
                 console.log(`isValid: ${isValid}`);
+
+                if (RSAResponse.success === true) {
+                    //TÀI KHOẢN NGƯỜI GỬI
+                    //trừ tiền vừa gửi
+                    let senderBalance = +senderInfo[0].AccountBalance - (+req.body.Money);
+
+                    //phí gửi
+                    if (req.body.Fee === 'NG') {
+                        senderBalance = +senderBalance - config.transaction.ExternalBank;
+                    }
+
+                    const newBalance2 = {
+                        AccountBalance: senderBalance
+                    };
+                    //update lai so du tai khoan
+                    const ret2 = await AccNumModel.updateMoney(senderInfo[0].UserID, newBalance2);
+
+                    //thông tin giao dịch
+                    const transInfo = {
+                        ...req.body,
+                        Time: moment().format('YYYY-MM-DD hh:mm:ss')
+                    };
+
+                    //lưu lại lịch sử giao dịch
+                    await TransModel.add(transInfo);
+
+                    //thêm vào bảng PartnerTransaction
+                    const transInfoPartner = {
+                        SendBank: 'HHBank',
+                        TakeBank: 'Sacombank',
+                        Money: req.body.Money,
+                        Time: moment().format('YYYY-MM-DD hh:mm:ss')
+                    };
+
+                    await PartnerTransModel.add(transInfoPartner);
+
+                    res.send({
+                        success: true,
+                        transInfo,
+                        message: 'Successful Transaction'
+                    });
+                } else {
+                    res.send({
+                        success: false,
+                        message: RSAResponse.message
+                    });
+                }
+
             })
             .catch(function(error) {
                 console.log(error);
@@ -246,52 +294,15 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
     }
 
     makePostRequest();
-
-    //TÀI KHOẢN NGƯỜI GỬI
-    //trừ tiền vừa gửi
-    let senderBalance = +senderInfo[0].AccountBalance - (+req.body.Money);
-
-    //phí gửi
-    if (req.body.Fee === 'NG') {
-        senderBalance = +senderBalance - config.transaction.ExternalBank;
-    }
-
-    const newBalance2 = {
-        AccountBalance: senderBalance
-    };
-    //update lai so du tai khoan
-    const ret2 = await AccNumModel.updateMoney(senderInfo[0].UserID, newBalance2);
-
-    //thông tin giao dịch
-    const transInfo = {
-        ...req.body,
-        Time: moment().format('YYYY-MM-DD hh:mm:ss')
-    };
-
-    //lưu lại lịch sử giao dịch
-    await TransModel.add(transInfo);
-
-    //thêm vào bảng PartnerTransaction
-    const transInfoPartner = {
-        SendBank: 'HHBank',
-        TakeBank: 'Sacombank',
-        Money: req.body.Money,
-        Time: moment().format('YYYY-MM-DD hh:mm:ss')
-    };
-
-    await PartnerTransModel.add(transInfoPartner);
-
-    res.send({
-        success: true,
-        transInfo,
-        message: 'Successful Transaction'
-    });
 })
 
 
 
 //GỬI MÃ OPT
 router.post('/otp', async(req, res) => {
+    // req.body = {
+    //     Number: ""
+    // }
 
     const OTP = createOTP();
     const senderInfo = await UserAccModel.singleByNumber(req.body.Number);

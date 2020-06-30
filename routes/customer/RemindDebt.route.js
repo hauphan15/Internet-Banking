@@ -18,8 +18,11 @@ router.post("/create", async function(req, res) {
 
     const debtorInfo = await UserAccModel.singleByNumber(req.body.DebtorNumber);
 
-    if (debtorInfo === null) {
-        return res.json({ success: false });
+    if (debtorInfo.length === 0) {
+        return res.json({
+            success: false,
+            message: 'Số tài khoản không hợp lệ'
+        });
     }
 
     const entity = {
@@ -33,18 +36,19 @@ router.post("/create", async function(req, res) {
     const result = await DebtorModel.Add(entity);
 
     res.json({
-        success: true
+        success: true,
+        message: 'Gửi nhắc nợ thành công'
     });
 });
 
 router.post('/delete', async(req, res) => {
     const user = await UserAccModel.singleByNumber(req.body.Number);
-    if(user === null) {
-        return res.json({success: false});
+    if (user === null) {
+        return res.json({ success: false });
     }
 
 
-    if(req.body.isdebtor) {
+    if (req.body.isdebtor) {
         const entity = {
             CreatorID: user[0].UserID,
             Debtor: req.body.UserID,
@@ -52,8 +56,7 @@ router.post('/delete', async(req, res) => {
             Money: req.body.Money
         }
         await DebtorModel.Delete(entity);
-    }
-    else {
+    } else {
         const entity = {
             CreatorID: req.body.UserID,
             DebtorID: user[0].UserID,
@@ -64,18 +67,18 @@ router.post('/delete', async(req, res) => {
         await DebtorModel.Delete(entity);
     }
 
-    res.json({success: true})
+    res.json({ success: true })
 })
 
 router.post('/debtorlist', async(req, res) => {
     const rows = await DebtorModel.getDebtor(req.body.UserID);
-    if(rows === null) {
-        return res.json({success: false});
+    if (rows === null) {
+        return res.json({ success: false });
     }
 
     const items = [];
 
-    for( var i = 0; i < rows.length ; i++){
+    for (var i = 0; i < rows.length; i++) {
         const user = await UserAccModel.singleById(rows[i].debtorID);
         var item = {
             FullName: user[0].FullName,
@@ -93,13 +96,13 @@ router.post('/debtorlist', async(req, res) => {
 
 router.post('/creatorlist', async(req, res) => {
     const rows = await DebtorModel.getCreditor(req.body.UserID);
-    if(rows === null) {
-        return res.json({success: false});
+    if (rows === null) {
+        return res.json({ success: false });
     }
 
     const items = [];
 
-    for( var i = 0; i < rows.length ; i++){
+    for (var i = 0; i < rows.length; i++) {
         const user = await UserAccModel.singleById(rows[i].creatorID);
         var item = {
             FullName: user[0].FullName,
@@ -134,9 +137,8 @@ router.post('/notify', async(req, res) => {
         from: 'hhbank.service@gmail.com',
         to: senderInfo[0].UserEmail,
         subject: 'Notice:',
-        text: 
-        `Dear ${senderInfo[0].FullName}
-        your debt: ${req.body.Content} - ${req.body.Money} is delete by ${user[0].FullName} 
+        text: `Dear ${senderInfo[0].FullName}
+        your debt: ${req.body.Content} - ${req.body.Money} is deleted by ${user[0].FullName} 
 
         HHBANK!
         `

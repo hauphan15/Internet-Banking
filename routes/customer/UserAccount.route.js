@@ -104,7 +104,7 @@ router.post('/changepw', async(req, res) => {
     if (!bcrypt.compareSync(req.body.OldPassword, hashPwd)) {
         return res.send({
             success: false,
-            message: 'Old password is incorrect'
+            message: 'Mật khẩu cũ không hợp lệ'
         })
     }
 
@@ -118,12 +118,12 @@ router.post('/changepw', async(req, res) => {
     if (result.changedRows === 1) {
         return res.send({
             success: true,
-            message: 'Your password has been successfully updated'
+            message: 'Cập nhật mật khẩu thành công'
         })
     } else {
         return res.send({
             success: false,
-            message: 'Failed update password '
+            message: 'Cập nhật mật khẩu thất bại'
         })
     }
 })

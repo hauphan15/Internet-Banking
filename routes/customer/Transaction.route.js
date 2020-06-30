@@ -25,6 +25,12 @@ router.post('/transaction', async function(req, res) {
     // };
 
     const takerInfo = await AccNumModel.singleByNumber(req.body.Number_NN);
+    if (takerInfo.length === 0) {
+        return res.send({
+            success: false,
+            message: 'Số tài khoản người nhận không hợp lệ'
+        })
+    }
 
     const senderInfo = await AccNumModel.singleByNumber(req.body.Number_NG);
 
@@ -140,6 +146,9 @@ router.post('/transaction', async function(req, res) {
 
 //GỬI MÃ OPT
 router.post('/trans/otp', async(req, res) => {
+    // req.body = {
+    //     Number: ""
+    // }
 
     const OTP = createOTP();
     const senderInfo = await UserAccModel.singleByNumber(req.body.Number);

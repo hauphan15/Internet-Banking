@@ -100,7 +100,10 @@ router.post('/history/take', async(req, res) => {
     for (let index = 0; index < history.length; index++) {
         history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
     }
-    res.send(history);
+    res.send({
+        success: true,
+        history
+    });
 })
 
 //giao dịch chuyển tiền
@@ -118,7 +121,10 @@ router.post('/history/send', async(req, res) => {
     for (let index = 0; index < history.length; index++) {
         history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
     }
-    res.send(history);
+    res.send({
+        success: true,
+        history
+    });
 })
 
 //giao dịch về nhắc nợ | trả nợ người khác hoặc người khác trả nợ
@@ -136,7 +142,10 @@ router.post('/history/debt', async(req, res) => {
     for (let index = 0; index < history.length; index++) {
         history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
     }
-    res.send(history);
+    res.send({
+        success: true,
+        history
+    });
 })
 
 module.exports = router;
