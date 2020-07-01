@@ -66,17 +66,17 @@ router.post('/addmoney-savingacc', async(req, res) => {
         Balance: balance
     };
     //update lai so du tai khoan
-    const result = await SavingAccModel.updateMoney(takerInfo[0].UserID, newBalance);
+    const result = await SavingAccModel.updateMoney(takerInfo[0].ID, newBalance);
 
     if (result.changedRows === 1) {
         return res.send({
             success: true,
-            message: 'Successfully update balance'
+            message: 'Cập nhật số dư tài khoản thành công'
         })
     } else {
         return res.send({
             success: false,
-            message: 'Failed update balance '
+            message: 'Cập nhật số dư tài khoản thất bại'
         })
     }
 })

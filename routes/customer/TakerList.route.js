@@ -102,12 +102,12 @@ router.post('/update', async(req, res) => {
     if (retUpdate.changedRows === 1) {
         res.send({
             success: true,
-            message: 'successful Update'
+            message: 'Cập nhật thành công'
         });
     } else {
         res.send({
             success: false,
-            message: 'Failed Update'
+            message: 'Cập nhật thất bại'
         });
     }
 })

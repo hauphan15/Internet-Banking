@@ -83,11 +83,11 @@ router.post('/otp', async(req, res) => {
     const mailOptions = {
         from: 'hhbank.service@gmail.com',
         to: senderInfo[0].UserEmail,
-        subject: 'OTP Verification - HHBank',
-        text: `
-        Dear ${senderInfo[0].UserName}
-        This is your OTP code for changing password: ${OTP}
-        This code will expire 5 minutes later`
+        subject: 'Xác thực mã OTP - HHBank',
+        text: `Xin chào khách hàng ${senderInfo[0].UserName}
+         Đây là mã OTP để đổi mật khẩu: ${OTP}
+         Vui lòng xác thực trong vòng 5 phút trước khi mã hết hạn
+         Thân chào!`
     };
     transporter.sendMail(mailOptions, function(error, info) {
         if (error) {

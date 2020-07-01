@@ -25,7 +25,7 @@ router.post('/create-acc', async(req, res) => {
     if (usrname.length > 0) {
         return res.send({
             success: false,
-            message: 'Username already exists'
+            message: 'Tên đăng nhập đã được sử dụng'
         })
     }
 
@@ -71,7 +71,7 @@ router.post('/create-savingacc', async(req, res) => {
     if (userInfo.length === 0) {
         return res.send({
             success: false,
-            message: 'Username not found'
+            message: 'Tên đăng nhập không hợp lệ'
         })
     }
 

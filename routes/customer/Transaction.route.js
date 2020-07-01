@@ -43,11 +43,10 @@ router.post('/transaction', async function(req, res) {
     const optHeader = req.headers['x-otp-code'];
 
     if (+optHeader !== +UserOTP[0].Code || checkTime > 7200) { // 7200s == 3h
-        res.send({
+        return res.send({
             success: false,
-            message: 'Invalid OTP code or expired OPT code'
+            message: 'Mã OTP không hợp lệ hoặc hết hạn'
         })
-        throw createError(401, 'Invalid OTP code or expired OPT code');
     }
 
     const transInfo = {
@@ -61,19 +60,17 @@ router.post('/transaction', async function(req, res) {
         if (+senderInfo[0].AccountBalance < (+req.body.Money + +config.transaction.InternaBank)) { //số dư có bé hơn tiền gửi + phí hay k
             result = { //TH ng gửi trả phí
                 success: false,
-                message: 'Balance is not enough for the transaction'
+                message: 'Số dư không đủ cho phiên giao dịch'
             }
-            res.send(result);
-            throw createError(401, 'Balance is not enough for the transaction');
+            return res.send(result);
         }
     } else {
         if (+senderInfo[0].AccountBalance < +req.body.Money) { //số dư có bé tiền gửi,TH gửi nhận trả phí
             result = {
                 success: false,
-                message: 'Balance is not enough for the transaction'
+                message: 'Số dư không đủ cho phiên giao dịch'
             }
-            res.send(result);
-            throw createError(401, 'Balance is not enough for the transaction');
+            return res.send(result);
         }
     }
 
@@ -81,10 +78,9 @@ router.post('/transaction', async function(req, res) {
     if (senderInfo.length === 0) {
         result = {
             success: false,
-            message: 'SenderNumber not found'
+            message: 'Tài khoản người gửi không tồn tại'
         }
-        res.send(result);
-        throw createError(401, 'SenderNumber not found');
+        return res.send(result);
     }
 
 
@@ -123,12 +119,12 @@ router.post('/transaction', async function(req, res) {
     if (ret1.changedRows === 1 && ret2.changedRows === 1) {
         result = {
             success: true,
-            message: 'Successful Transaction'
+            message: 'Giao dịch thành công'
         }
     } else {
         result = {
             success: false,
-            message: 'Failed Transaction'
+            message: 'Giao dịch thất bại'
         }
     }
 
@@ -168,11 +164,11 @@ router.post('/trans/otp', async(req, res) => {
     const mailOptions = {
         from: 'hhbank.service@gmail.com',
         to: senderInfo[0].UserEmail,
-        subject: 'OTP Verification - HHBank',
-        text: `Dear ${senderInfo[0].UserName}
-         This is your OTP code for validating the transaction: ${OTP}
-         This code will expire 2 hours later
-        `
+        subject: 'Xác thực mã OTP - HHBank',
+        text: `Xin chào khách hàng ${senderInfo[0].UserName}
+         Đây là mã OTP để xác thực giao dịch: ${OTP}
+         Vui lòng xác thực trong vòng 2 giờ trước khi mã hết hạn
+         Thân chào!`
     };
     transporter.sendMail(mailOptions, function(error, info) {
         if (error) {

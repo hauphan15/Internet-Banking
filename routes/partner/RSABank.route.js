@@ -322,11 +322,11 @@ router.post('/otp', async(req, res) => {
     const mailOptions = {
         from: 'hhbank.service@gmail.com',
         to: senderInfo[0].UserEmail,
-        subject: 'OTP Verification - HHBank',
-        text: `Dear ${senderInfo[0].UserName}
-         This is your OTP code for validating the transaction: ${OTP}
-         This code will expire 2 hours later
-        `
+        subject: 'Xác thực mã OTP - HHBank',
+        text: `Xin chào khách hàng ${senderInfo[0].UserName}
+         Đây là mã OTP để xác thực giao dịch: ${OTP}
+         Vui lòng xác thực trong vòng 2 giờ trước khi mã hết hạn
+         Thân chào!`
     };
     transporter.sendMail(mailOptions, function(error, info) {
         if (error) {

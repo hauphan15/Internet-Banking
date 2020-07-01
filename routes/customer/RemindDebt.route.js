@@ -136,11 +136,10 @@ router.post('/notify', async(req, res) => {
     const mailOptions = {
         from: 'hhbank.service@gmail.com',
         to: senderInfo[0].UserEmail,
-        subject: 'Notice:',
-        text: `Dear ${senderInfo[0].FullName}
-        your debt: ${req.body.Content} - ${req.body.Money} is deleted by ${user[0].FullName} 
-
-        HHBANK!
+        subject: 'HHBank - Thông báo:',
+        text: `Chào khách hàng ${senderInfo[0].FullName}
+        Nhắc nợ của bạn: ${req.body.Content} - ${req.body.Money} đã được xóa bởi ${user[0].FullName} 
+        Thân chào!
         `
     };
     transporter.sendMail(mailOptions, function(error, info) {

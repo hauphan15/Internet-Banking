@@ -10,7 +10,6 @@ router.get('/employee-list', async(req, res) => {
     const result = await EmployeeModel.all();
 
     for (let index = 0; index < result.length; index++) {
-        result[index].DoB = moment(result[index].DoB).format('DD-MM-YYYY');
         delete result[index].UserPassword;
     }
 
@@ -34,7 +33,7 @@ router.post('/add-employee', async(req, res) => {
     if (usrname.length > 0) {
         return res.send({
             success: false,
-            message: 'Username already exists'
+            message: 'Tên đăng nhập đã được sử dụng'
         })
     }
 
@@ -64,66 +63,34 @@ router.post('/delete-employee', async(req, res) => {
 //update info nhân viên
 router.post('/update-employee', async(req, res) => {
     // entity = {
-    //     "UserName": "",
+    //     "ID": "",
     //     "FullName": "",
     //     "Email": "",
     //     "Phone": "",
     //     "DoB": "",
     // }
 
-    const info = await EmployeeModel.singleById(req.body.ID);
-
-    let UserName = req.body.UserName;
-    let Email = req.body.Email;
-    let Phone = req.body.Phone;
-    let DoB = req.body.DoB;
-    let FullName = req.body.FullName;
-
-    //nếu ko update UserName
-    if (UserName === '') {
-        UserName = info[0].UserName;
-    }
-    //nếu không update Email
-    if (Email === '') {
-        Email = info[0].Email;
-    }
-    //nếu không update Phone
-    if (Phone === '') {
-        Phone = info[0].Phone;
-    }
-    //nếu không update DoB
-    if (DoB === '') {
-        DoB = info[0].DoB;
-    }
-    //nếu không update FullName
-    if (FullName === '') {
-        FullName = info[0].FullName;
-    }
-
     const entity = {
-        UserName: UserName,
-        FullName: FullName,
-        Email: Email,
-        Phone: Phone,
-        DoB: DoB
+        FullName: req.body.FullName,
+        Email: req.body.Email,
+        Phone: req.body.Phone,
+        DoB: req.body.DoB
     };
 
     const retUpdate = await EmployeeModel.updateInfo(req.body.ID, entity);
 
-    let result;
     if (retUpdate.changedRows === 1) {
-        result = {
+        return res.send({
             success: true,
-            message: 'Successful update'
-        }
+            message: 'Cập nhật thành công'
+        })
     } else {
-        result = {
+        return res.send({
             success: false,
-            message: 'Failed update'
-        }
+            message: 'Cập nhật thất bại'
+        })
     }
 
-    res.send(result);
 })
 
 

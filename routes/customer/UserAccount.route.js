@@ -133,11 +133,10 @@ router.post('/changepw', async(req, res) => {
 router.post('/info', async function(req, res) {
     const id = await userAccountModel.singleByNumber(req.body.Number);
     if (id.length === 0) {
-        res.json({
+        return res.json({
             success: false,
             message: 'Number not found'
         });
-        throw createError(401, 'Number not found');
     }
 
     const name = await userAccountModel.singleById(id[0].UserID);
