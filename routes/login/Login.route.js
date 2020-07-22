@@ -133,7 +133,7 @@ router.post("/employee-refresh", async(req, res) => {
 
     jwt.verify(
         req.body.accessToken,
-        config.auth.secret, { ignoreExpiration: true },
+        config.token.secret, { ignoreExpiration: true },
         async function(err, payload) {
             const employeeId = req.body.id;
             const ret = await EmployeeModel.verifyRefreshToken(
@@ -162,7 +162,7 @@ router.post("/admin-refresh", async(req, res) => {
 
     jwt.verify(
         req.body.accessToken,
-        config.auth.secret, { ignoreExpiration: true },
+        config.token.secret, { ignoreExpiration: true },
         async function(err, payload) {
             const adminId = req.body.id;
             const ret = await AdminModel.verifyRefreshToken(

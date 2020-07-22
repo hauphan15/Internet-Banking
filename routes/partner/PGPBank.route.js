@@ -16,6 +16,13 @@ const router = express.Router();
 
 
 router.post('/get-info', (req, res) => {
+
+    // req.body = {
+    //     "UserID": "",
+    //      "Name": "",
+    //     "Number": ""
+    // }
+
     const body = {
         accountNumber: req.body.Number,
     };
@@ -36,18 +43,45 @@ router.post('/get-info', (req, res) => {
                     'x-partner-time': moment().unix().toString(),
                 }
             })
-            .then(function(response) {
+            .then(async function(response) {
                 console.log(response.data);
-                return res.json({
-                    success: true,
-                    data: response.data
-                });
+                const result = response.data;
+                if (result.success === true) {
+
+                    let name = req.body.Name;
+                    if (name === '') { //nếu k nhập tên gợi nhớ thì lấy tên đăng ký
+                        name = result.data.name;
+                    }
+
+                    const taker = {
+                        UserID: req.body.UserID,
+                        Number: req.body.Number,
+                        Name: name
+                    };
+
+                    const retAdd = await TakerListModel.add(taker);
+                    const takerName = await TakerListModel.singleById(retAdd.insertId);
+                    const object = {
+                        ID: retAdd.insertId,
+                        Number: req.body.Number,
+                        Name: takerName[0].Name
+                    };
+                    return res.send({
+                        success: true,
+                        object
+                    });
+                } else {
+                    return res.send({
+                        success: false,
+                        message: 'Số tài khoản không hợp lệ'
+                    })
+                }
             })
             .catch(function(error) {
                 console.log(error);
                 return res.json({
                     success: false,
-                    message: error
+                    message: 'Gửi request thất bại'
                 })
             });
     }

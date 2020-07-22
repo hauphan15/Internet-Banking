@@ -21,8 +21,6 @@ router.post('/get-info', async(req, res) => {
     //     "Number": ""
     // }
 
-    let info;
-
     //private key cua HHBANK
     const rsaPrivateKey = `-----BEGIN RSA PRIVATE KEY-----
 MIICXQIBAAKBgQCfNquA8GzsoFPyzYUzSRCs+k1S3zXiYpVKqjr2/2FgYLOZKNj4
