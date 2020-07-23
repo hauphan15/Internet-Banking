@@ -17,7 +17,7 @@ app.use(express.urlencoded({
     extended: true
 }));
 
-app.get('/', verifyToken, function(req, res) {
+app.get('/', function(req, res) {
     res.send('Hello from Mrhauphan !!');
 });
 
