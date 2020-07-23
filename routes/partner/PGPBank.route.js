@@ -10,6 +10,7 @@ const AccNumModel = require('../../models/AccountNumber.model');
 const nodemailer = require('nodemailer');
 const config = require('../../config/default.json');
 const UserOTPModel = require('../../models/UserOTP.model');
+const TakerListModel = require('../../models/TakerList.model');
 
 
 const router = express.Router();
@@ -24,9 +25,8 @@ router.post('/get-info', (req, res) => {
     // }
 
     const body = {
-        accountNumber: req.body.Number,
+        accountNumber: +req.body.Number,
     };
-
     const username = 'nhom16';
     const password = 'nhom16';
 
@@ -46,11 +46,18 @@ router.post('/get-info', (req, res) => {
             .then(async function(response) {
                 console.log(response.data);
                 const result = response.data;
-                if (result.success === true) {
+                // result = {
+                //     id: '1',
+                //     createdAt: '2020-07-04T04:30:54.263Z',
+                //     updatedAt: '2020-07-04T04:45:07.605Z',
+                //     name: 'Hoàng Dân An',
+                //     accountNumber: '10000000'
+                // };
+                if (true) {
 
                     let name = req.body.Name;
                     if (name === '') { //nếu k nhập tên gợi nhớ thì lấy tên đăng ký
-                        name = result.data.name;
+                        name = result.name;
                     }
 
                     const taker = {
@@ -287,7 +294,7 @@ bYr+EdyxjzPTPmuiUqwCIMwH2t6tQA==
     if (+optHeader !== +UserOTP[0].Code || checkTime > 7200) { // 7200s == 3h
         return res.send({
             success: false,
-            message: 'Invalid OTP code or expired OPT code'
+            message: 'Mã OTP không hợp hoặc đã hết hạn'
         })
     }
 
@@ -296,14 +303,14 @@ bYr+EdyxjzPTPmuiUqwCIMwH2t6tQA==
         if (+senderInfo[0].AccountBalance < (+req.body.Money + +config.transaction.ExternalBank)) { //số dư có bé hơn tiền gửi + phí hay k
             return res.send({ //TH ng gửi trả phí
                 success: false,
-                message: 'Balance is not enough for the transaction'
+                message: 'Số dư tài khoản không đủ để thực hiện giao dịch'
             })
         }
     } else {
         if (+senderInfo[0].AccountBalance < +req.body.Money) { //số dư có bé hơn tiền gửi,TH gửi nhận trả phí
             return res.send({ //TH ng gửi trả phí
                 success: false,
-                message: 'Balance is not enough for the transaction'
+                message: 'Số dư tài khoản không đủ để thực hiện giao dịch'
             })
         }
     }
@@ -392,7 +399,7 @@ FxzP2+m6kXwJBnolqhvtIYW1rw==
 
 
         function makePostRequest() {
-            axios.post('https://beohoang98-bank-dev.herokuapp.com/api/partner/send', body, {
+            axios.post('https://beohoang98-bank-dev.herokuapp.com/api/partner/send/v2', body, {
                     auth: {
                         username,
                         password
@@ -402,10 +409,12 @@ FxzP2+m6kXwJBnolqhvtIYW1rw==
                         'x-partner-time': moment().unix().toString(),
                     }
                 })
-                .then(function(response) {
-                    const partnerSig = response.data.signature;
-                    const dt = response.data.data;
+                .then(async function(response) {
+
+                    const dt = response.data;
                     console.log(dt);
+
+                    //const partnerSig = response.data.signature;
                     // const verified = await openpgp.verify({
                     //     message: openpgp.cleartext.fromText(JSON.stringify(dt)),
                     //     signature: await openpgp.signature.readArmored(partnerSig),
@@ -418,6 +427,49 @@ FxzP2+m6kXwJBnolqhvtIYW1rw==
                     // } else {
                     //     throw new Error('signature could not be verified');
                     // }
+
+
+                    //TÀI KHOẢN NGƯỜI GỬI
+                    //trừ tiền vừa gửi
+                    let senderBalance = +senderInfo[0].AccountBalance - (+req.body.Money);
+
+                    //phí gửi
+                    if (req.body.Fee === 'NG') {
+                        senderBalance = +senderBalance - config.transaction.ExternalBank;
+                    }
+
+                    const newBalance2 = {
+                        AccountBalance: senderBalance
+                    };
+                    //update lai so du tai khoan
+                    const ret2 = await AccNumModel.updateMoney(senderInfo[0].UserID, newBalance2);
+
+                    //thông tin giao dịch
+                    const transInfo = {
+                        ...req.body,
+                        Time: moment().format('YYYY-MM-DD hh:mm:ss')
+                    };
+
+                    //lưu lại lịch sử giao dịch
+                    await TransModel.add(transInfo);
+
+
+                    //thêm vào bảng PartnerTransaction
+                    const transInfoPartner = {
+                        SendBank: 'HHBank',
+                        TakeBank: 'Nhom16',
+                        Money: req.body.Money,
+                        Time: moment().format('YYYY-MM-DD hh:mm:ss')
+                    };
+
+                    await PartnerTransModel.add(transInfoPartner);
+
+                    res.send({
+                        success: true,
+                        transInfo,
+                        message: 'Successful transaction'
+                    });
+
                 })
                 .catch(function(error) {
                     console.log(error);
@@ -426,48 +478,6 @@ FxzP2+m6kXwJBnolqhvtIYW1rw==
         makePostRequest();
     }
     signAndVerify();
-
-
-    //TÀI KHOẢN NGƯỜI GỬI
-    //trừ tiền vừa gửi
-    let senderBalance = +senderInfo[0].AccountBalance - (+req.body.Money);
-
-    //phí gửi
-    if (req.body.Fee === 'NG') {
-        senderBalance = +senderBalance - config.transaction.ExternalBank;
-    }
-
-    const newBalance2 = {
-        AccountBalance: senderBalance
-    };
-    //update lai so du tai khoan
-    const ret2 = await AccNumModel.updateMoney(senderInfo[0].UserID, newBalance2);
-
-    //thông tin giao dịch
-    const transInfo = {
-        ...req.body,
-        Time: moment().format('YYYY-MM-DD hh:mm:ss')
-    };
-
-    //lưu lại lịch sử giao dịch
-    await TransModel.add(transInfo);
-
-
-    //thêm vào bảng PartnerTransaction
-    const transInfoPartner = {
-        SendBank: 'HHBank',
-        TakeBank: 'Nhom16',
-        Money: req.body.Money,
-        Time: moment().format('YYYY-MM-DD hh:mm:ss')
-    };
-
-    await PartnerTransModel.add(transInfoPartner);
-
-    res.send({
-        success: true,
-        transInfo,
-        message: 'Successful transaction'
-    });
 })
 
 
