@@ -233,6 +233,7 @@ router.post('/add', async function(req, res) {
 
 
         //add vào bảng PartnerTransactions
+        console.log(moment().format('YYYY-MM-DD hh:mm:ss'));
         const transInfo = {
             TransID: trans.insertId,
             SendBank: req.PartnerBank,
