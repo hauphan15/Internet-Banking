@@ -218,15 +218,6 @@ router.post('/add', async function(req, res) {
             message: 'Successful Transaction'
         };
 
-        //add vào bảng PartnerTransactions
-        const transInfo = {
-            SendBank: req.PartnerBank,
-            TakeBank: 'HHBank',
-            Money: req.Data.amount,
-            Time: moment().format('YYYY-MM-DD hh:mm:ss')
-        };
-        await PartnerTransModel.add(transInfo);
-
         //add vào bảng transactions
         //thông tin giao dịch
         const transInfo2 = {
@@ -238,8 +229,18 @@ router.post('/add', async function(req, res) {
             Number_NN: req.Data.numberReceiver,
             Fee: 'NG'
         };
-        //lưu lại lịch sử giao dịch
-        await TransModel.add(transInfo2);
+        const trans = await TransModel.add(transInfo2);
+
+
+        //add vào bảng PartnerTransactions
+        const transInfo = {
+            TransID: trans.insertId,
+            SendBank: req.PartnerBank,
+            TakeBank: 'HHBank',
+            Money: req.Data.amount,
+            Time: moment().format('YYYY-MM-DD hh:mm:ss')
+        };
+        await PartnerTransModel.add(transInfo);
 
     } else {
         result = {

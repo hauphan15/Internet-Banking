@@ -263,10 +263,11 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
                     };
 
                     //lưu lại lịch sử giao dịch
-                    await TransModel.add(transInfo);
+                    const trans = await TransModel.add(transInfo);
 
                     //thêm vào bảng PartnerTransaction
                     const transInfoPartner = {
+                        TransID: trans.insertId,
                         SendBank: 'HHBank',
                         TakeBank: 'Sacombank',
                         Money: req.body.Money,
