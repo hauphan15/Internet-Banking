@@ -1,7 +1,7 @@
 const express = require('express');
 const AccNumModel = require('../../models/AccountNumber.model');
-const createError = require('http-errors');
 const PartnerTransModel = require('../../models/PartnerTransaction.model');
+const TransModel = require('../../models/Transaction.model');
 const openpgp = require('openpgp');
 const moment = require('moment');
 
@@ -184,7 +184,14 @@ const router = express.Router();
 
 //API DÀNH CHO NGÂN HÀNG ĐỐI TÁC CHUYỂN TIỀN VÀO
 router.post('/add', async function(req, res) {
-    const id = await AccNumModel.singleByNumber(req.Data.Number);
+    // req.body = {
+    //     numberReceiver
+    //     numberSender
+    //     amount
+    //     message
+    // }
+
+    const id = await AccNumModel.singleByNumber(req.Data.numberReceiver);
 
     var result;
 
@@ -193,11 +200,10 @@ router.post('/add', async function(req, res) {
             success: false,
             message: 'Number not found'
         }
-        res.send(result);
-        throw createError(401, 'Number not found');
+        return res.send(result);
     }
     const accBal = await AccNumModel.singleById(id[0].UserID); //lay so du tai khoan
-    const money = +accBal[0].AccountBalance + (+req.Data.Money); //cong voi tien can nap vo
+    const money = +accBal[0].AccountBalance + (+req.Data.amount); //cong voi tien can nap vo
 
     const entity = {
         AccountBalance: money
@@ -216,11 +222,24 @@ router.post('/add', async function(req, res) {
         const transInfo = {
             SendBank: req.PartnerBank,
             TakeBank: 'HHBank',
-            Money: req.Data.Money,
+            Money: req.Data.amount,
             Time: moment().format('YYYY-MM-DD hh:mm:ss')
         };
-
         await PartnerTransModel.add(transInfo);
+
+        //add vào bảng transactions
+        //thông tin giao dịch
+        const transInfo2 = {
+            Money: req.Data.amount,
+            Type: 'CHUYENKHOAN',
+            Time: moment().format('YYYY-MM-DD hh:mm:ss'),
+            Number_NG: req.Data.numberSender,
+            Content: req.Data.message,
+            Number_NN: req.Data.numberReceiver,
+            Fee: 'NG'
+        };
+        //lưu lại lịch sử giao dịch
+        await TransModel.add(transInfo2);
 
     } else {
         result = {

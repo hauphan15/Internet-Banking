@@ -199,8 +199,10 @@ VDuD8Sm0MqcDhrUJAgMBAAE=
 
     //request gui nap tien
     const content_transfer = {
-        number: req.body.Number_NN,
-        amount: req.body.Money
+        numberReceiver: req.body.Number_NN,
+        numberSender: req.body.Number_NG,
+        amount: req.body.Money,
+        message: req.body.Content
     };
 
     //encrypt goi tin content_transfer
