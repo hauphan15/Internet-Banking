@@ -75,5 +75,7 @@ module.exports = {
             return true;
 
         return false;
-    }
+    },
+
+    removeAccount: CustomerId => db.load(`DELETE FROM useraccounts WHERE UserID = ${CustomerId}`)
 };

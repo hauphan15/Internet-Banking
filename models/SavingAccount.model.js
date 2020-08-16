@@ -17,4 +17,6 @@ module.exports = {
         // }
         return db.add('SavingAccounts', entity);
     },
+
+    removeAccount: CustomerId => db.load(`DELETE FROM SavingAccounts WHERE UserID = ${CustomerId}`)
 };

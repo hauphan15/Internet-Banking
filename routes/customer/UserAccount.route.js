@@ -146,4 +146,32 @@ router.post('/info', async function(req, res) {
     });
 })
 
+
+//Đóng tài khoản
+router.post('/removeacc', async(req, res) => {
+    // req.body = {
+    //     "UserID": ""
+    //     "Password":""
+    // }
+
+    const rows = await userAccountModel.singleById(req.body.UserID);
+
+    const hashPwd = rows[0].UserPassword;
+    if (!bcrypt.compareSync(req.body.Password, hashPwd)) {
+        return res.send({
+            success: false,
+            message: 'Mật khẩu không hợp lệ'
+        })
+    }
+
+    await userAccountModel.removeAccount(req.body.UserID);
+    await SavingAccModel.removeAccount(req.body.UserID);
+    await AccNumberModel.removeAccount(req.body.UserID);
+
+    res.json({
+        success: true,
+        message: 'Xóa thành công'
+    })
+})
+
 module.exports = router;

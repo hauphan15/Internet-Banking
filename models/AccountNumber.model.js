@@ -17,4 +17,6 @@ module.exports = {
         // }
         return db.add('AccountNumbers', entity);
     },
+
+    removeAccount: CustomerId => db.load(`DELETE FROM AccountNumbers WHERE UserID = ${CustomerId}`)
 };
