@@ -51,7 +51,7 @@ router.post('/delete', async(req, res) => {
     if (req.body.isdebtor) {
         const entity = {
             CreatorID: user[0].UserID,
-            Debtor: req.body.UserID,
+            DebtorID: req.body.UserID,
             Content: req.body.Content,
             Money: req.body.Money
         }
