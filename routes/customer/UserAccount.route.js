@@ -44,6 +44,10 @@ router.post('/history/take', async(req, res) => {
     const userInfo = await userAccountModel.singleById(req.body.UserID);
     const history = await TransactionModel.allTakeTrans(userInfo[0].Number);
 
+    if (history.length === 0) {
+        return res.send(history);
+    }
+
     for (let index = 0; index < history.length; index++) {
         history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
     }
@@ -61,6 +65,11 @@ router.post('/history/send', async(req, res) => {
     // }
     const userInfo = await userAccountModel.singleById(req.body.UserID);
     const history = await TransactionModel.allSendTrans(userInfo[0].Number);
+
+    if (history.length === 0) {
+        return res.send(history);
+    }
+
     for (let index = 0; index < history.length; index++) {
         history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
     }
@@ -78,6 +87,11 @@ router.post('/history/debt', async(req, res) => {
     // }
     const userInfo = await userAccountModel.singleById(req.body.UserID);
     const history = await TransactionModel.allDebTrans(userInfo[0].Number);
+
+    if (history.length === 0) {
+        return res.send(history);
+    }
+
     for (let index = 0; index < history.length; index++) {
         history[index].Time = moment(history[index].Time).format('DD-MM-YYYY hh:mm');
     }

@@ -1,7 +1,11 @@
 const db = require('../utils/db');
 
 module.exports = {
-    all: _ => db.load('SELECT * FROM partnertransactions'),
+    all: _ => db.load(`
+        SELECT * 
+        FROM partnertransactions
+        WHERE MONTH(Time) = MONTH(CURRENT_DATE())
+        AND YEAR(Time) = YEAR(CURRENT_DATE())`),
 
     singleById: id => db.load(`SELECT * FROM partnertransactions WHERE ID = ${id} `),
 
@@ -28,6 +32,6 @@ module.exports = {
 
     byPartnerBank: partner => db.load(
         `SELECT * 
-        FROM partnertransactions 
-        WHERE SendBank = '${partner}' OR TakeBank = '${partner}' `)
+        FROM ( SELECT * FROM partnertransactions WHERE MONTH(Time) = MONTH(CURRENT_DATE()) AND YEAR(Time) = YEAR(CURRENT_DATE()) ) as CurrentMonth
+        WHERE CurrentMonth.SendBank = '${partner}' OR CurrentMonth.TakeBank = '${partner}' `)
 }
