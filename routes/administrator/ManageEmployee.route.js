@@ -5,6 +5,12 @@ const moment = require('moment');
 
 const router = express.Router();
 
+
+router.get("/", (req, res) => {
+    res.json("hello");
+})
+
+
 //lấy tất cả nhân viên
 router.get('/employee-list', async(req, res) => {
     const result = await EmployeeModel.all();

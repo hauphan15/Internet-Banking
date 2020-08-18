@@ -8,6 +8,12 @@ const createError = require('http-errors');
 
 const router = express.Router();
 
+router.get("/", (req, res) => {
+    res.json("hello");
+})
+
+
+
 //create an account by employee
 router.post('/create-acc', async(req, res) => {
     // req.body = {
