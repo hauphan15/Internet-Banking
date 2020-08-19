@@ -21,6 +21,7 @@ router.get('/', async(req, res) => {
 //lấy tài khoảng thanh toán
 router.post('/account/spending', async(req, res) => {
     const spendingAcc = await AccNumberModel.singleById(req.body.UserID);
+
     delete spendingAcc[0].AccNumID;
     delete spendingAcc[0].UserID;
     res.json(spendingAcc);
@@ -29,6 +30,11 @@ router.post('/account/spending', async(req, res) => {
 //lấy tài khoản tiết kiệm
 router.post('/account/saving', async(req, res) => {
     const savingAcc = await SavingAccModel.singleByUserId(req.body.UserID);
+
+    if (history.savingAcc === 0) {
+        return res.send(savingAcc);
+    }
+
     delete savingAcc[0].ID;
     delete savingAcc[0].UserID;
     res.json(savingAcc);
