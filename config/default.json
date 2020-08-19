@@ -28,7 +28,7 @@
     },
     "token": {
         "secret": "secretKey",
-        "expiresIn": "5m",
+        "expiresIn": "1m",
         "refreshTokenSz": 80
     },
     "transaction": {
