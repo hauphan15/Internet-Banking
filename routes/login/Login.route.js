@@ -136,12 +136,15 @@ router.post("/employee-refresh", async(req, res) => {
         config.token.secret, { ignoreExpiration: true },
         async function(err, payload) {
             const employeeId = req.body.id;
+            console.log(employeeId);
             const ret = await EmployeeModel.verifyRefreshToken(
                 employeeId,
                 req.body.refreshToken
             );
             if (ret === false) {
-                throw createError(400, "Invalid refresh token.");
+                return res.json({
+                    success: false
+                });
             }
 
             const accessToken = generateAccessToken(employeeId);
@@ -170,7 +173,9 @@ router.post("/admin-refresh", async(req, res) => {
                 req.body.refreshToken
             );
             if (ret === false) {
-                throw createError(400, "Invalid refresh token.");
+                return res.json({
+                    success: false
+                });
             }
 
             const accessToken = generateAccessToken(adminId);
