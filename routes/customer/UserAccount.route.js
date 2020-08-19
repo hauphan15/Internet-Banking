@@ -31,7 +31,7 @@ router.post('/account/spending', async(req, res) => {
 router.post('/account/saving', async(req, res) => {
     const savingAcc = await SavingAccModel.singleByUserId(req.body.UserID);
 
-    if (history.savingAcc === 0) {
+    if (savingAcc.length === 0) {
         return res.send(savingAcc);
     }
 
